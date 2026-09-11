@@ -62,20 +62,48 @@ object SafariRunController {
             )
         }
 
-        announceClearedBiome()
+        onBiomeCleared()
         if (SafariSession.isComplete) checkCompletion()
     }
 
     /**
-     * Tells the party that the biome this player covers is done. Deliberately English only and
-     * in Hypixel's own wording, because the rest of the party has to read it.
+     * Fires once per run when the biome this player covers is done: the time always lands in your
+     * own chat, the party line is optional, and the best time per biome is kept like the overall
+     * personal best.
      */
-    private fun announceClearedBiome() {
-        if (!ConfigManager.config.critterSafari.chat.announceBiomeClearedToParty) return
+    private fun onBiomeCleared() {
         val biome = ConfigManager.config.critterSafari.selectedBiome
         if (!SafariSession.isCleared(biome)) return
         if (!SafariSession.markBiomeAnnounced(biome)) return
-        ChatOut.runCommand("pc ${biome.clearedPartyMessage}")
+
+        val duration = SafariSession.elapsedMs
+        ChatOut.send("chat.biomeCleared", biome.coloredName, TimeFormat.clock(duration))
+
+        if (ConfigManager.config.critterSafari.chat.announceBiomeClearedToParty) {
+            // Deliberately English and in Hypixel's own wording: the party has to read it.
+            ChatOut.runCommand("pc ${biome.clearedPartyMessage}")
+        }
+
+        if (!SafariSession.validForPersonalBest) {
+            ChatOut.send("chat.biomeClearNotCounted")
+            return
+        }
+        val previousBest = SafariStats.recordBiomeClear(biome, duration)
+        when {
+            previousBest == null -> ChatOut.send("chat.biomeClearFirstBest")
+
+            duration < previousBest -> ChatOut.send(
+                "chat.biomeClearNewBest",
+                TimeFormat.clock(previousBest),
+                TimeFormat.clock(previousBest - duration),
+            )
+
+            else -> ChatOut.send(
+                "chat.biomeClearKept",
+                TimeFormat.clock(previousBest),
+                TimeFormat.clock(duration - previousBest),
+            )
+        }
     }
 
     private fun checkCompletion() {

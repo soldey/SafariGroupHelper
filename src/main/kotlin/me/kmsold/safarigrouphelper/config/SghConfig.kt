@@ -45,7 +45,6 @@ class HudPos(
     @Expose var x: Int = 0,
     @Expose var y: Int = 0,
     @Expose var scale: Float = 1.0f,
-    @Expose var enabled: Boolean = true,
 )
 
 class GeneralConfig {
@@ -86,6 +85,26 @@ class CritterSafariHudConfig {
     @ConfigOption(name = "HUD background", desc = "Draws a translucent black box behind every HUD block.")
     @ConfigEditorBoolean
     var hudBackground: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Show my biome", desc = "The block with your own biome and its critter list.")
+    @ConfigEditorBoolean
+    var showMyBiome: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Show other biomes", desc = "The block summarising the other three biomes.")
+    @ConfigEditorBoolean
+    var showOtherBiomes: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Show total progress", desc = "The block with the overall bar from 0 to 100%.")
+    @ConfigEditorBoolean
+    var showTotalProgress: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Show run info", desc = "The block with the timer, catch counts and personal best.")
+    @ConfigEditorBoolean
+    var showRunInfo: Boolean = true
 }
 
 /** Subcategory of Critter Safari: what the tracker says in chat. */

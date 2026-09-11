@@ -68,7 +68,6 @@
   "screen.hudEditor.title": "Safari Group Helper - редактор HUD",
   "screen.hudEditor.hintDrag": "§7Тащи блок мышкой, чтобы переместить",
   "screen.hudEditor.hintScroll": "§7Колесо над блоком меняет размер",
-  "screen.hudEditor.hintRightClick": "§7ПКМ по блоку скрывает или показывает его",
   "screen.hudEditor.hintKeys": "§7R - сбросить все позиции, Esc - выход",
   "config.category.critterSafari.name": "Critter Safari",
   "config.category.critterSafari.desc": "Подсчёт уникальных critters, пойманных твоей группой",
@@ -113,5 +112,18 @@
   "config.runHistory.history.name": "Последние забеги",
   "config.runHistory.history.desc": "Десять самых свежих забегов, новые сверху.",
   "config.critterSafariChat.announceBiomeClearedToParty.name": "Сообщения в пати",
-  "config.critterSafariChat.announceBiomeClearedToParty.desc": "Отправляет §e/pc <biome> is cleared§7, когда все critters твоего биома пойманы. Это сообщение уходит в пати, а не только тебе, и всегда на английском."
+  "config.critterSafariChat.announceBiomeClearedToParty.desc": "Отправляет §e/pc <biome> is cleared§7, когда все critters твоего биома пойманы. Это сообщение уходит в пати, а не только тебе, и всегда на английском.",
+  "chat.biomeCleared": "§a%1$s §7зачищен за §e%2$s",
+  "chat.biomeClearFirstBest": "§dПервая зачистка этого биома - это твой рекорд!",
+  "chat.biomeClearNewBest": "§dНОВЫЙ РЕКОРД БИОМА! §7(было: %1$s, §a-%2$s§7)",
+  "chat.biomeClearKept": "§7Рекорд биома остаётся §e%1$s §c(+%2$s)",
+  "chat.biomeClearNotCounted": "§7Забег сбрасывали посреди сафари, поэтому зачистка не засчитана.",
+  "config.critterSafariHud.showMyBiome.name": "Показывать мой биом",
+  "config.critterSafariHud.showMyBiome.desc": "Блок с твоим биомом и списком его critters.",
+  "config.critterSafariHud.showOtherBiomes.name": "Показывать остальные биомы",
+  "config.critterSafariHud.showOtherBiomes.desc": "Блок со сводкой по трём остальным биомам.",
+  "config.critterSafariHud.showTotalProgress.name": "Показывать общий прогресс",
+  "config.critterSafariHud.showTotalProgress.desc": "Блок с общей полосой от 0 до 100%.",
+  "config.critterSafariHud.showRunInfo.name": "Показывать инфо о забеге",
+  "config.critterSafariHud.showRunInfo.desc": "Блок с таймером, счётчиком поимок и рекордом."
 }

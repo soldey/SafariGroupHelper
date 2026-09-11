@@ -17,6 +17,8 @@ data class StatsState(
     var duplicates: MutableMap<String, Int> = LinkedHashMap(),
     /** The most recent runs, newest first, capped at [RunHistory.MAX_ENTRIES]. */
     var runs: MutableList<RunRecord> = ArrayList(),
+    /** Fastest clear of a single biome, keyed by [CritterBiome.name]. */
+    var biomeBest: MutableMap<String, Long> = LinkedHashMap(),
 )
 
 /** Long-lived statistics that survive across runs: personal best and lifetime duplicate counts. */
@@ -42,6 +44,8 @@ object SafariStats {
         if (state.duplicates == null) state.duplicates = LinkedHashMap()
         @Suppress("SENSELESS_COMPARISON")
         if (state.runs == null) state.runs = ArrayList()
+        @Suppress("SENSELESS_COMPARISON")
+        if (state.biomeBest == null) state.biomeBest = LinkedHashMap()
     }
 
     fun addDuplicate(critter: String) {
@@ -79,6 +83,20 @@ object SafariStats {
     }
 
     val personalBestMs: Long? get() = state.bestCompletionMs.takeIf { it > 0 }
+
+    fun biomeBestMs(biome: CritterBiome): Long? = state.biomeBest[biome.name]?.takeIf { it > 0 }
+
+    /**
+     * Records how long it took to clear one biome.
+     * @return the previous best for that biome, or null when this is the first clear.
+     */
+    fun recordBiomeClear(biome: CritterBiome, durationMs: Long): Long? {
+        val previous = biomeBestMs(biome)
+        if (previous == null || durationMs < previous) state.biomeBest[biome.name] = durationMs
+        dirty = true
+        save()
+        return previous
+    }
 
     fun tick() {
         if (dirty) save()

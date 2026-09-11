@@ -68,12 +68,16 @@
   "screen.hudEditor.title": "Safari Group Helper - HUD editor",
   "screen.hudEditor.hintDrag": "§7Drag a block to move it",
   "screen.hudEditor.hintScroll": "§7Scroll over a block to resize it",
-  "screen.hudEditor.hintRightClick": "§7Right click a block to hide or show it",
   "screen.hudEditor.hintKeys": "§7R - reset all positions, Esc - done",
   "chat.runResetInSafari": "§eRun progress reset. §7This run no longer counts for the personal best.",
   "chat.completionNotCounted": "§7The run was reset partway, so it does not count for the personal best.",
   "runHistory.empty": "§7No runs recorded yet.",
   "runHistory.line": "§8%1$d. §7%2$s §8| §b%3$d/%4$d §8| §e%5$s%6$s",
   "runHistory.complete": " §a✔",
-  "runHistory.invalid": " §c(reset)"
+  "runHistory.invalid": " §c(reset)",
+  "chat.biomeCleared": "§a%1$s §7cleared in §e%2$s",
+  "chat.biomeClearFirstBest": "§dFirst clear of this biome - new personal best!",
+  "chat.biomeClearNewBest": "§dNEW BIOME BEST! §7(old: %1$s, §a-%2$s§7)",
+  "chat.biomeClearKept": "§7Biome best stays at §e%1$s §c(+%2$s)",
+  "chat.biomeClearNotCounted": "§7The run was reset partway, so this clear does not count."
 }
