@@ -62,7 +62,20 @@ object SafariRunController {
             )
         }
 
+        announceClearedBiome()
         if (SafariSession.isComplete) checkCompletion()
+    }
+
+    /**
+     * Tells the party that the biome this player covers is done. Deliberately English only and
+     * in Hypixel's own wording, because the rest of the party has to read it.
+     */
+    private fun announceClearedBiome() {
+        if (!ConfigManager.config.critterSafari.chat.announceBiomeClearedToParty) return
+        val biome = ConfigManager.config.critterSafari.selectedBiome
+        if (!SafariSession.isCleared(biome)) return
+        if (!SafariSession.markBiomeAnnounced(biome)) return
+        ChatOut.runCommand("pc ${biome.clearedPartyMessage}")
     }
 
     private fun checkCompletion() {

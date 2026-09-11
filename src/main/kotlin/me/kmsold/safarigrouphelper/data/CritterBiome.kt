@@ -88,6 +88,12 @@ enum class CritterBiome(
     /** Colour code plus translated name, the usual way a biome is dropped into a message. */
     val coloredName: String get() = "$colorCode$translatedName"
 
+    /**
+     * What gets sent to party chat when this biome is done. English on purpose and never
+     * localised: the rest of the group has to be able to read it.
+     */
+    val clearedPartyMessage: String get() = "$displayName is cleared"
+
     override fun toString(): String = translatedName
 
     val total: Int get() = critters.size

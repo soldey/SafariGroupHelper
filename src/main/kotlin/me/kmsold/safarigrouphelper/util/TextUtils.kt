@@ -23,6 +23,15 @@ object ChatOut {
     }
 
     fun send(key: String, vararg args: Any?) = send(tr(key, *args))
+
+    /**
+     * Runs a command as if the player typed it. Unlike [send] this leaves the client, so it is
+     * only ever called for features the player switched on.
+     */
+    fun runCommand(command: String) {
+        val connection = Minecraft.getInstance().player?.connection ?: return
+        connection.sendCommand(command)
+    }
 }
 
 object TimeFormat {

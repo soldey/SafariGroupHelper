@@ -23,6 +23,8 @@ data class SessionState(
     /** Cleared by a mid-run reset: such a run must not set a personal best. */
     var validForPersonalBest: Boolean = true,
     var totalCatches: Int = 0,
+    /** Biomes already announced to the party this run, so it is said once and only once. */
+    var announcedBiomes: MutableSet<String> = LinkedHashSet(),
     var catches: MutableMap<String, CatchEntry> = LinkedHashMap(),
 )
 
@@ -51,6 +53,8 @@ object SafariSession {
         }
         @Suppress("SENSELESS_COMPARISON")
         if (state.catches == null) state.catches = LinkedHashMap()
+        @Suppress("SENSELESS_COMPARISON")
+        if (state.announcedBiomes == null) state.announcedBiomes = LinkedHashSet()
     }
 
     /** Throws away whatever was there and starts counting from zero. */
@@ -128,6 +132,15 @@ object SafariSession {
     val duplicates: Int get() = (state.totalCatches - uniqueTotal).coerceAtLeast(0)
 
     val isComplete: Boolean get() = uniqueTotal >= CritterBiome.totalCritterCount
+
+    fun isCleared(biome: CritterBiome): Boolean = uniques(biome) >= biome.total
+
+    /** @return true the first time this biome is reported as cleared during this run. */
+    fun markBiomeAnnounced(biome: CritterBiome): Boolean {
+        if (!state.announcedBiomes.add(biome.name)) return false
+        markDirty()
+        return true
+    }
 
     /** Marks the moment 100% was reached. Returns true the first time it is called for a run. */
     fun markCompleted(): Boolean {
