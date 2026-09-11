@@ -42,7 +42,7 @@ object SafariGroupHelper : ClientModInitializer {
 
     override fun onInitializeClient() {
         ConfigManager.load()
-        Localization.reload(ConfigManager.config.accessibility.language)
+        Localization.reload(ConfigManager.config.general.language)
         SafariStats.load()
         SafariSession.load()
         ChatPatterns.load()

@@ -58,10 +58,28 @@ class GeneralConfig {
     val editPositions: Runnable = Runnable {
         SafariGroupHelper.openScreen(HudEditorScreen(Minecraft.getInstance().screen))
     }
+
+    @Expose
+    @ConfigOption(
+        name = "Language",
+        desc = "Language of the mod's own text. §eAuto§7 follows Minecraft. Critter and location " +
+            "names are never translated, they appear in Hypixel chat as they are.",
+    )
+    @ConfigEditorDropdown
+    var language: Language = Language.AUTO
 }
 
 /** Subcategory of Critter Safari: what the tracker draws on screen. */
 class CritterSafariHudConfig {
+
+    @ConfigOption(
+        name = "HUD positions",
+        desc = "The same editor as in General: drag blocks, scroll to resize, §eR§7 resets them.",
+    )
+    @ConfigEditorButton(buttonText = "Edit")
+    val editPositions: Runnable = Runnable {
+        SafariGroupHelper.openScreen(HudEditorScreen(Minecraft.getInstance().screen))
+    }
 
     @Expose
     @ConfigOption(
@@ -173,18 +191,6 @@ class CritterSafariConfig {
     var runHistory: RunHistoryConfig = RunHistoryConfig()
 }
 
-class AccessibilityConfig {
-
-    @Expose
-    @ConfigOption(
-        name = "Language",
-        desc = "Language of the mod's own text. §eAuto§7 follows Minecraft. Critter and location " +
-            "names are never translated, they appear in Hypixel chat as they are.",
-    )
-    @ConfigEditorDropdown
-    var language: Language = Language.AUTO
-}
-
 class DevConfig {
 
     @Expose
@@ -218,10 +224,6 @@ class SghConfig : Config() {
     var critterSafari: CritterSafariConfig = CritterSafariConfig()
 
     @Expose
-    @Category(name = "Accessibility", desc = "Language and ease of use")
-    var accessibility: AccessibilityConfig = AccessibilityConfig()
-
-    @Expose
     @Category(name = "Dev", desc = "Chat parsing internals and debugging")
     var dev: DevConfig = DevConfig()
 
@@ -238,7 +240,7 @@ class SghConfig : Config() {
         ConfigManager.save()
         // Picking another language only needs the strings swapped; the settings screen itself is
         // rebuilt the next time it is opened.
-        Localization.reload(accessibility.language)
+        Localization.reload(general.language)
         SghConfigGui.invalidate()
     }
 }

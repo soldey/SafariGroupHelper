@@ -35,7 +35,6 @@ class ConfigStructureTest {
         val titles = categories().values.map { it.title }
         assertTrue("General" in titles, "categories found: $titles")
         assertTrue("Critter Safari" in titles, "categories found: $titles")
-        assertTrue("Accessibility" in titles, "categories found: $titles")
         assertTrue("Dev" in titles, "categories found: $titles")
     }
 
@@ -52,13 +51,19 @@ class ConfigStructureTest {
 
     @Test
     fun `top level categories have no parent`() {
-        val topLevel = categories().values.filter { it.title in setOf("General", "Critter Safari", "Accessibility", "Dev") }
+        val topLevel = categories().values.filter { it.title in setOf("General", "Critter Safari", "Dev") }
         assertTrue(topLevel.all { it.parent == null }, "expected top level categories, got $topLevel")
     }
 
     @Test
-    fun `general holds the hud position editor`() {
+    fun `general holds the hud position editor and the language picker`() {
         val general = categories().values.single { it.title == "General" }
-        assertEquals(listOf("HUD positions"), general.options)
+        assertEquals(listOf("HUD positions", "Language"), general.options)
+    }
+
+    @Test
+    fun `the hud subcategory repeats the position editor`() {
+        val hud = categories().values.single { it.title == "Hud" }
+        assertEquals("HUD positions", hud.options.first())
     }
 }

@@ -36,8 +36,7 @@ object HudContent {
     private const val BAR_WIDTH = 20
 
     fun build(block: HudBlock, inInventory: Boolean, editorPreview: Boolean): BlockContent {
-        // The editor shows every block, so one that is switched off can still be placed.
-        if (!editorPreview && !block.visible) return BlockContent(emptyList())
+        if (!block.visible) return BlockContent(emptyList())
         val config = ConfigManager.config
         val showProgress = editorPreview || SafariSession.progressVisible
         val selectAllowed = editorPreview || LocationTracker.biomeSelectAllowed(config.critterSafari.hud.biomeSelectVisibility)

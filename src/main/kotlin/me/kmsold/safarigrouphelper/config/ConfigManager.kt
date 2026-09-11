@@ -82,6 +82,12 @@ object ConfigManager {
             json.remove("hud")?.let { critterSafari.add("hud", it) }
         }
         migrateBlockVisibility(json)
+        // The language picker used to have a category of its own.
+        json.getAsJsonObject("accessibility")?.remove("language")?.let { language ->
+            val general = json.getAsJsonObject("general") ?: JsonObject().also { json.add("general", it) }
+            general.add("language", language)
+            json.remove("accessibility")
+        }
         return json
     }
 

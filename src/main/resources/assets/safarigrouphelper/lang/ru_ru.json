@@ -75,16 +75,12 @@
   "config.category.general.desc": "Настройки, не привязанные к конкретному модулю",
   "config.category.hud.name": "Hud",
   "config.category.hud.desc": "Что модуль рисует на экране",
-  "config.category.accessibility.name": "Доступность",
-  "config.category.accessibility.desc": "Язык и удобство использования",
   "config.category.dev.name": "Dev",
   "config.category.dev.desc": "Внутренности парсинга чата и отладка",
   "config.critterSafari.enabled.name": "Включён",
   "config.critterSafari.enabled.desc": "Включает или выключает модуль Critter Safari. Когда выключен, нет ни HUD, ни парсинга чата.",
   "config.hud.editPositions.name": "Позиции HUD",
   "config.hud.editPositions.desc": "Тащи блоки мышкой, колесо меняет размер, ПКМ скрывает блок, §eR§7 сбрасывает все позиции.",
-  "config.accessibility.language.name": "Язык",
-  "config.accessibility.language.desc": "Язык интерфейса мода. §eAuto§7 берёт язык Minecraft. Имена critters не переводятся.",
   "config.dev.parseOnlyInSafari.name": "Парсить чат только в Safari",
   "config.dev.parseOnlyInSafari.desc": "Полностью пропускает разбор чата за пределами Critter Safari. Оставь включённым, если не ищешь проблему с парсингом.",
   "config.dev.debugChatParsing.name": "Отладка парсинга чата",
@@ -125,5 +121,9 @@
   "config.critterSafariHud.showTotalProgress.name": "Показывать общий прогресс",
   "config.critterSafariHud.showTotalProgress.desc": "Блок с общей полосой от 0 до 100%.",
   "config.critterSafariHud.showRunInfo.name": "Показывать инфо о забеге",
-  "config.critterSafariHud.showRunInfo.desc": "Блок с таймером, счётчиком поимок и рекордом."
+  "config.critterSafariHud.showRunInfo.desc": "Блок с таймером, счётчиком поимок и рекордом.",
+  "config.general.language.name": "Язык",
+  "config.general.language.desc": "Язык интерфейса мода. §eAuto§7 берёт язык Minecraft. Имена critters не переводятся.",
+  "config.critterSafariHud.editPositions.name": "Позиции HUD",
+  "config.critterSafariHud.editPositions.desc": "Тот же редактор, что и в General: тащи блоки, колесо меняет размер, §eR§7 сбрасывает позиции."
 }
