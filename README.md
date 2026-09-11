@@ -39,3 +39,22 @@ sidebar plus the chat message you get when entering the safari.
 | `/sgh dump` | Print what the mod sees about your location (for debugging) |
 | `/sgh reset` | Reset the progress of the current run |
 | `/sgh debug` | Toggle chat parsing debug output |
+
+## Something broken?
+
+Do not just describe it - **grab the log and send it to me straight away**, otherwise there is
+nothing to go on.
+
+Discord: **soldey**
+
+What to send:
+
+1. `logs/latest.log` from your game folder. In the Modrinth App: right click the instance ->
+   `Open folder` -> `logs/latest.log`. Attach the file itself, not a screenshot.
+2. The output of `/sgh dump` - it shows what the mod thinks about your location.
+3. If catches are not being counted: turn on `/sgh debug`, play one run, then also send
+   `config/safarigrouphelper/chat-debug.log`. It contains every chat line the mod saw inside
+   the safari, which is exactly what is needed to fix the parsing.
+
+Send the log right after the problem happens: `latest.log` is overwritten every time the game
+starts.
