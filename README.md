@@ -1,83 +1,41 @@
 # Safari Group Helper
 
-Клиентский Fabric-мод для Hypixel SkyBlock, который считает **уникальных critters**, пойманных
-твоей группой за один заход в Critter Safari.
+A Fabric client mod for Hypixel SkyBlock that tracks the **unique critters** your group catches
+during a single Critter Safari run.
 
-Версии: **Minecraft 26.1.x** (собрано на 26.1.2), Fabric Loader 0.19.3+, Fabric API,
-Fabric Language Kotlin. ModMenu — опционально.
+Targets **Minecraft 26.1.x** (built against 26.1.2) and needs Fabric Loader 0.19.3+, Fabric API
+and Fabric Language Kotlin. ModMenu is optional.
 
-**Настоятельно рекомендуется** `hypixel-mod-api` — через него мод точно понимает, где ты
-находишься (`mode=safari` / `mode=foraging_3`). Без него используется запасной вариант:
-строка `⏣ <локация>` из сайдбара плюс сообщение о входе из чата.
+`hypixel-mod-api` is **strongly recommended**: it tells the mod exactly where you are
+(`mode=safari` / `mode=foraging_3`). Without it the mod falls back to the `⏣ <area>` line of the
+sidebar plus the chat message you get when entering the safari.
 
-## Что умеет
+## Features
 
-* **Выбор своего биома** — Cavern / Forest / Haunted / Icy. Меняется кликом по плашке
-  `[Switch biome]` прямо в HUD или командой `/sgh biome <cavern|forest|haunted|icy>`.
-  Кнопка по умолчанию показывается **только когда открыт инвентарь/сундук**; где именно
-  она вообще доступна (только Safari / Safari + Torrhus Canyon / везде) настраивается.
-* **Список critters своего биома** с отметками ✔/✖ и счётчиком повторов (`x3`).
-* **Прогресс остальных биомов** одним блоком: выключено / только `3/9` / полный список.
-* **Общий прогресс** 0–100% с полоской (всего 37 critters).
-* **Таймер забега** + количество поимок и повторов + личный рекорд.
-* **Личный рекорд (PB)**: при 100% по всем биомам мод пишет время забега в чат
-  (только тебе, ничего не уходит на сервер) и сохраняет лучший результат.
-* **Перетаскиваемые блоки HUD** — `/sgh gui`, тащи мышкой, колесо меняет масштаб,
-  правый клик выключает блок, `R` сбрасывает позиции.
-* **Прогресс виден только внутри Critter Safari**, чат парсится тоже только там.
+* **Pick your biome** - Cavern / Forest / Haunted / Icy. Change it by clicking the
+  `[Switch biome]` label in the HUD or with `/sgh biome <cavern|forest|haunted|icy>`.
+  By default the button only shows up **while an inventory or chest is open**; where it is
+  available at all (Safari only / Safari + Torrhus Canyon / everywhere) is configurable.
+* **Critter list for your biome** with ✔/✖ marks and a repeat counter (`x3`).
+* **Progress of the other biomes** in a single block: off / just `3/9` / full critter list.
+* **Overall progress** from 0 to 100% with a bar (37 critters in total).
+* **Run timer** plus catch and repeat counts.
+* **Personal best**: on 100% across all biomes the mod prints your run time in chat
+  (client side only, nothing is sent to the server) and stores your best result.
+* **Draggable HUD blocks** - `/sgh gui`, drag with the mouse, scroll to resize,
+  right click to hide a block, `R` resets every position.
+* **Progress is only shown inside the Critter Safari**, and chat is only parsed there.
 
-## Команды
+## Commands
 
-| Команда | Что делает |
+| Command | What it does |
 | --- | --- |
-| `/sgh` / `/sgh settings` | Экран настроек |
-| `/sgh gui` | Редактор позиций HUD |
-| `/sgh biome` | Окно выбора биома |
-| `/sgh biome forest` | Сразу выбрать биом |
-| `/sgh others off\|compact\|full` | Режим блока «другие биомы» |
-| `/sgh status` | Текущий прогресс в чат |
-| `/sgh dump` | Что мод видит о локации (для отладки) |
-| `/sgh reset` | Сбросить прогресс забега |
-| `/sgh debug` | Вкл/выкл отладку парсинга чата |
-
-## Сборка
-
-```bash
-./gradlew build
-```
-
-Готовый мод: `build/libs/safari-group-helper-<версия>.jar`.
-Запуск дев-клиента: `./gradlew runClient`. Тесты парсера: `./gradlew test`.
-
-## Парсинг чата
-
-Мод понимает строки вида:
-
-```
-CAPTURE! You caught a Shyworm and gained a Shyworm Shard!
-[MVP+] [Tom_Fisher head]Tom_Fisher entered Critter Safari!
-[NPC] Safari Manager: I already saw your ticket, so you're free to go.
-```
-
-Перед сопоставлением строка очищается: убираются цветовые коды и все `[...]`-блоки.
-Регулярки лежат в `config/safarigrouphelper/patterns.json` — их можно править без
-пересборки мода. Удали файл, чтобы вернуть значения по умолчанию.
-
-Если Hypixel где-то формулирует сообщение иначе, включи `/sgh debug`:
-
-* каждая строка чата внутри сафари пишется в `config/safarigrouphelper/chat-debug.log`;
-* строки, похожие на поимку, но не распознанные, подсвечиваются в чате красным.
-
-По ним легко дописать новый паттерн в `patterns.json`.
-
-Sparkling-версии считаются как обычный critter (`Sparkling Gemzie` → `Gemzie`).
-
-## Файлы данных
-
-`config/safarigrouphelper/`:
-
-* `config.json` — настройки и позиции HUD
-* `session.json` — текущий забег (переживает релог: возврат в сафари в течение 3 минут
-  продолжает тот же забег)
-* `stats.json` — личный рекорд и пожизненный счётчик повторов по каждому critter
-* `patterns.json` — регулярки парсера
+| `/sgh` / `/sgh settings` | Settings screen |
+| `/sgh gui` | HUD position editor |
+| `/sgh biome` | Biome picker screen |
+| `/sgh biome forest` | Pick a biome directly |
+| `/sgh others off\|compact\|full` | Display mode of the "other biomes" block |
+| `/sgh status` | Print the current progress in chat |
+| `/sgh dump` | Print what the mod sees about your location (for debugging) |
+| `/sgh reset` | Reset the progress of the current run |
+| `/sgh debug` | Toggle chat parsing debug output |
