@@ -92,6 +92,15 @@ class CritterParsingTest {
     }
 
     @Test
+    fun `parses a loot share with a stack and a different verb`() {
+        val parsed = parse(
+            "LOOT SHARE! You received 3x Hideyho Shard from [MrJerson head]MrJerson finding the Hideyho!",
+        )
+        assertEquals("Hideyho", parsed?.critter)
+        assertEquals("MrJerson", parsed?.player)
+    }
+
+    @Test
     fun `sparkling critters count as their base critter`() {
         val parsed = parse("CAPTURE! You caught a Sparkling Gemzie and gained a Gemzie Shard!")
         assertEquals("Gemzie", parsed?.critter)

@@ -1,20 +1,19 @@
 {
-  "version": 3,
+  "version": 4,
   "_comment": [
     "Patterns are matched with find() against the cleaned chat line:",
     "formatting codes removed, every [bracketed] segment removed, whitespace collapsed.",
     "Example: '[MVP+] [Tom_Fisher head]Tom_Fisher entered Critter Safari!'",
     "becomes  'Tom_Fisher entered Critter Safari!'.",
-    "Named groups 'player' and 'critter' are what the mod reads.",
+    "Named groups 'player' and 'critter' are what the mod reads; a capture only counts",
+    "when the critter group matches a known critter, so the patterns can stay loose.",
     "Order matters: the first pattern that yields a known critter wins.",
     "This file can be edited freely; delete it to get the bundled defaults back."
   ],
   "catch": [
-    "CAPTURE! (?<player>You|[A-Za-z0-9_]{2,16}) caught an? (?<critter>[A-Za-z' -]+?)(?: and gained [^!]*)?!",
-    "LOOT SHARE! .*? from (?<player>[A-Za-z0-9_]{2,16}) catching an? (?<critter>[A-Za-z' -]+?)!",
-    "(?<player>[A-Za-z0-9_]{2,16}) catching an? (?<critter>[A-Za-z' -]+?)!",
-    "(?<player>You|[A-Za-z0-9_]{2,16}) caught an? (?<critter>[A-Za-z' -]+?)(?: and gained [^!]*)?!",
-    "(?<player>You|[A-Za-z0-9_]{2,16}) captured an? (?<critter>[A-Za-z' -]+?)(?: and gained [^!]*)?!"
+    "CAPTURE! (?<player>You|[A-Za-z0-9_]{2,16}) [a-z]+ (?:an?|the) (?<critter>[A-Za-z' -]+?)(?: and gained [^!]*)?!",
+    "from (?<player>[A-Za-z0-9_]{2,16}) [a-z]+ing (?:(?:an?|the) )?(?<critter>[A-Za-z' -]+?)!",
+    "(?<player>You|[A-Za-z0-9_]{2,16}) (?:caught|captured|found) (?:an?|the) (?<critter>[A-Za-z' -]+?)(?: and gained [^!]*)?!"
   ],
   "enterSafari": [
     "(?<player>[A-Za-z0-9_]{2,16}) entered Critter Safari!"
@@ -26,6 +25,8 @@
     "caught",
     "catching",
     "captured",
-    "capture"
+    "capture",
+    "found",
+    "finding"
   ]
 }
