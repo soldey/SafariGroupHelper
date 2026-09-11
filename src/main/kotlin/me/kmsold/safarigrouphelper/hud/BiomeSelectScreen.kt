@@ -18,7 +18,7 @@ class BiomeSelectScreen(private val parent: Screen?) : Screen(tr("screen.biomePi
         val buttonHeight = 20
         val startY = height / 2 - (CritterBiome.entries.size * (buttonHeight + 4)) / 2
         CritterBiome.entries.forEachIndexed { index, biome ->
-            val selected = biome == ConfigManager.config.general.selectedBiome
+            val selected = biome == ConfigManager.config.critterSafari.selectedBiome
             // Counters are a Critter Safari thing; outside of it the last run's numbers would
             // just be stale noise, so only the biome name is shown.
             val label = if (SafariSession.progressVisible) {
@@ -28,7 +28,7 @@ class BiomeSelectScreen(private val parent: Screen?) : Screen(tr("screen.biomePi
             }.apply { if (selected) append(tr("screen.biomePicker.selected")) }
             addRenderableWidget(
                 Button.builder(label) {
-                    ConfigManager.config.general.selectedBiome = biome
+                    ConfigManager.config.critterSafari.selectedBiome = biome
                     ConfigManager.save()
                     rebuildWidgets()
                 }.bounds(width / 2 - buttonWidth / 2, startY + index * (buttonHeight + 4), buttonWidth, buttonHeight)

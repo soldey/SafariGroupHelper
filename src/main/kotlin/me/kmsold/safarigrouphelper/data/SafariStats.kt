@@ -3,6 +3,7 @@ package me.kmsold.safarigrouphelper.data
 import com.google.gson.GsonBuilder
 import me.kmsold.safarigrouphelper.SafariGroupHelper
 import me.kmsold.safarigrouphelper.config.ConfigManager
+import me.kmsold.safarigrouphelper.config.SghConfigGui
 import kotlin.io.path.exists
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -14,6 +15,8 @@ data class StatsState(
     var runsCompleted: Int = 0,
     /** Lifetime repeat catches per critter - not used for progress, kept for future features. */
     var duplicates: MutableMap<String, Int> = LinkedHashMap(),
+    /** The most recent runs, newest first, capped at [RunHistory.MAX_ENTRIES]. */
+    var runs: MutableList<RunRecord> = ArrayList(),
 )
 
 /** Long-lived statistics that survive across runs: personal best and lifetime duplicate counts. */
@@ -37,11 +40,22 @@ object SafariStats {
         }
         @Suppress("SENSELESS_COMPARISON")
         if (state.duplicates == null) state.duplicates = LinkedHashMap()
+        @Suppress("SENSELESS_COMPARISON")
+        if (state.runs == null) state.runs = ArrayList()
     }
 
     fun addDuplicate(critter: String) {
         state.duplicates[critter] = (state.duplicates[critter] ?: 0) + 1
         dirty = true
+    }
+
+    /** Files a finished run into the history and drops anything past the tenth. */
+    fun recordRun(record: RunRecord) {
+        state.runs.add(0, record)
+        while (state.runs.size > RunHistory.MAX_ENTRIES) state.runs.removeAt(state.runs.size - 1)
+        save()
+        // The history is baked into the settings screen when it is built.
+        SghConfigGui.invalidate()
     }
 
     fun runStarted() {

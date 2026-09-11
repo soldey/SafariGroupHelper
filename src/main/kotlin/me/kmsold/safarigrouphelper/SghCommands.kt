@@ -81,7 +81,7 @@ object SghCommands {
             ChatOut.send("command.unknownBiome", raw, CritterBiome.entries.joinToString(", ") { it.key })
             return 0
         }
-        ConfigManager.config.general.selectedBiome = biome
+        ConfigManager.config.critterSafari.selectedBiome = biome
         ConfigManager.save()
         ChatOut.send("command.biomeSet", biome.coloredName)
         return 1
@@ -93,7 +93,7 @@ object SghCommands {
             ChatOut.send("command.unknownMode", raw, OtherBiomesMode.entries.joinToString(", ") { it.name.lowercase() })
             return 0
         }
-        ConfigManager.config.hud.otherBiomesMode = mode
+        ConfigManager.config.critterSafari.hud.otherBiomesMode = mode
         ConfigManager.save()
         ChatOut.send("command.othersMode", mode.toString())
         return 1
@@ -134,7 +134,7 @@ object SghCommands {
     }
 
     private fun printStatus(): Int {
-        val biome = ConfigManager.config.general.selectedBiome
+        val biome = ConfigManager.config.critterSafari.selectedBiome
         val area = when {
             LocationTracker.inSafari -> LocationTracker.CRITTER_SAFARI
             LocationTracker.inCanyon -> LocationTracker.TORRHUS_CANYON

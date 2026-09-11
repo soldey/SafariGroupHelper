@@ -67,6 +67,20 @@ object ConfigManager {
             critterSafari.add("enabled", general.remove("enabled"))
             json.add("critterSafari", critterSafari)
         }
+        // 1.3.0 kept the module's own options outside of it; they are subcategories now.
+        if (json.has("hud") || general?.has("selectedBiome") == true) {
+            SafariGroupHelper.logger.info("Moving the module options under 'critterSafari'")
+            val critterSafari = json.getAsJsonObject("critterSafari") ?: JsonObject().also {
+                json.add("critterSafari", it)
+            }
+            general?.remove("selectedBiome")?.let { critterSafari.add("selectedBiome", it) }
+            general?.remove("announceNewUniques")?.let {
+                val chat = JsonObject()
+                chat.add("announceNewUniques", it)
+                critterSafari.add("chat", chat)
+            }
+            json.remove("hud")?.let { critterSafari.add("hud", it) }
+        }
         return json
     }
 

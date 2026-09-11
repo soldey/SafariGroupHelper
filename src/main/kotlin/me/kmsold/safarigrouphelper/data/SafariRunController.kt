@@ -14,7 +14,7 @@ object SafariRunController {
         val fresh = SafariSession.startOrResume()
         if (fresh) {
             SafariStats.runStarted()
-            val biome = ConfigManager.config.general.selectedBiome
+            val biome = ConfigManager.config.critterSafari.selectedBiome
             ChatOut.send("chat.runStarted", "${biome.colorCode}${biome.translatedName}")
         } else {
             ChatOut.send("chat.runResumed", TimeFormat.clock(SafariSession.elapsedMs))
@@ -24,6 +24,16 @@ object SafariRunController {
     fun onLeaveSafari() {
         if (!SafariSession.isActive) return
         val elapsed = SafariSession.elapsedMs
+        SafariStats.recordRun(
+            RunRecord(
+                startedAt = SafariSession.state.startedAt,
+                durationMs = elapsed,
+                uniques = SafariSession.uniqueTotal,
+                total = CritterBiome.totalCritterCount,
+                completed = SafariSession.isComplete,
+                valid = SafariSession.validForPersonalBest,
+            ),
+        )
         SafariSession.stop()
         SafariSession.save()
         ChatOut.send(
@@ -43,7 +53,7 @@ object SafariRunController {
         val isNew = SafariSession.record(critter, player)
         val biome = CritterBiome.biomeOf(critter)
 
-        if (isNew && ConfigManager.config.general.announceNewUniques) {
+        if (isNew && ConfigManager.config.critterSafari.chat.announceNewUniques) {
             ChatOut.send(
                 "chat.newUnique",
                 critter,
@@ -61,9 +71,15 @@ object SafariRunController {
     private fun checkCompletion() {
         if (!SafariSession.markCompleted()) return
         val duration = SafariSession.completionMs ?: SafariSession.elapsedMs
-        val previousBest = SafariStats.recordCompletion(duration)
-
         ChatOut.send("chat.complete", CritterBiome.totalCritterCount, TimeFormat.clock(duration))
+
+        // A run that was reset halfway started with capsules already spent, so its time is not
+        // comparable and must never become the personal best.
+        if (!SafariSession.validForPersonalBest) {
+            ChatOut.send("chat.completionNotCounted")
+            return
+        }
+        val previousBest = SafariStats.recordCompletion(duration)
         when {
             previousBest == null -> ChatOut.send("chat.firstCompletion")
 

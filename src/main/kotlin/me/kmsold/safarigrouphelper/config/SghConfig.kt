@@ -6,13 +6,14 @@ import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import me.kmsold.safarigrouphelper.SafariGroupHelper
 import me.kmsold.safarigrouphelper.data.CritterBiome
+import me.kmsold.safarigrouphelper.hud.HudEditorScreen
 import me.kmsold.safarigrouphelper.l10n.Language
 import me.kmsold.safarigrouphelper.l10n.Localization
-import me.kmsold.safarigrouphelper.hud.HudEditorScreen
 import net.minecraft.client.Minecraft
 
 /** How the "other biomes" HUD block is rendered. */
@@ -47,40 +48,7 @@ class HudPos(
     @Expose var enabled: Boolean = true,
 )
 
-class CritterSafariConfig {
-
-    @Expose
-    @ConfigOption(
-        name = "Enabled",
-        desc = "Turns the Critter Safari module on or off. With it off there is no HUD and no " +
-            "chat parsing at all.",
-    )
-    @ConfigEditorBoolean
-    var enabled: Boolean = true
-}
-
 class GeneralConfig {
-
-    @Expose
-    @ConfigOption(
-        name = "My biome",
-        desc = "The biome you cover for the group. Its critter list gets the detailed HUD block, " +
-            "the other three are summarised separately.",
-    )
-    @ConfigEditorDropdown
-    var selectedBiome: CritterBiome = CritterBiome.FOREST
-
-    @Expose
-    @ConfigOption(
-        name = "Announce new uniques",
-        desc = "Prints one line in your own chat whenever a critter is caught for the first time " +
-            "this run, with the biome and the running total.",
-    )
-    @ConfigEditorBoolean
-    var announceNewUniques: Boolean = true
-}
-
-class HudConfig {
 
     @ConfigOption(
         name = "HUD positions",
@@ -91,6 +59,10 @@ class HudConfig {
     val editPositions: Runnable = Runnable {
         SafariGroupHelper.openScreen(HudEditorScreen(Minecraft.getInstance().screen))
     }
+}
+
+/** Subcategory of Critter Safari: what the tracker draws on screen. */
+class CritterSafariHudConfig {
 
     @Expose
     @ConfigOption(
@@ -116,13 +88,70 @@ class HudConfig {
     var hudBackground: Boolean = true
 }
 
+/** Subcategory of Critter Safari: what the tracker says in chat. */
+class CritterSafariChatConfig {
+
+    @Expose
+    @ConfigOption(
+        name = "Announce new uniques",
+        desc = "Prints one line in your own chat whenever a critter is caught for the first time " +
+            "this run, with the biome and the running total.",
+    )
+    @ConfigEditorBoolean
+    var announceNewUniques: Boolean = true
+}
+
+/**
+ * Subcategory of Critter Safari: a read-only look at the last runs. The text itself is generated
+ * by [LocalizedConfigProcessor] when the settings screen is built.
+ */
+class RunHistoryConfig {
+
+    @ConfigOption(name = "Last runs", desc = "The ten most recent runs, newest first.")
+    @ConfigEditorInfoText(infoTitle = "")
+    val history: String = ""
+}
+
+class CritterSafariConfig {
+
+    @Expose
+    @ConfigOption(
+        name = "Enabled",
+        desc = "Turns the Critter Safari module on or off. With it off there is no HUD and no " +
+            "chat parsing at all.",
+    )
+    @ConfigEditorBoolean
+    var enabled: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "My biome",
+        desc = "The biome you cover for the group. Its critter list gets the detailed HUD block, " +
+            "the other three are summarised separately.",
+    )
+    @ConfigEditorDropdown
+    var selectedBiome: CritterBiome = CritterBiome.FOREST
+
+    @Expose
+    @Category(name = "Hud", desc = "What the tracker draws on screen")
+    var hud: CritterSafariHudConfig = CritterSafariHudConfig()
+
+    @Expose
+    @Category(name = "Chat", desc = "What the tracker writes in chat")
+    var chat: CritterSafariChatConfig = CritterSafariChatConfig()
+
+    @Expose
+    @Category(name = "Run history", desc = "Your last ten runs")
+    var runHistory: RunHistoryConfig = RunHistoryConfig()
+}
+
 class AccessibilityConfig {
 
     @Expose
     @ConfigOption(
         name = "Language",
-        desc = "Language of the mod's own text. §eAuto§7 follows Minecraft. Critter names are " +
-            "never translated, they appear in Hypixel chat as they are.",
+        desc = "Language of the mod's own text. §eAuto§7 follows Minecraft. Critter and location " +
+            "names are never translated, they appear in Hypixel chat as they are.",
     )
     @ConfigEditorDropdown
     var language: Language = Language.AUTO
@@ -153,16 +182,12 @@ class DevConfig {
 class SghConfig : Config() {
 
     @Expose
-    @Category(name = "Critter Safari", desc = "Tracking unique critters caught by your group")
-    var critterSafari: CritterSafariConfig = CritterSafariConfig()
-
-    @Expose
-    @Category(name = "General", desc = "Your biome and how the mod talks to you")
+    @Category(name = "General", desc = "Settings that are not tied to one module")
     var general: GeneralConfig = GeneralConfig()
 
     @Expose
-    @Category(name = "HUD", desc = "What is drawn on screen and where")
-    var hud: HudConfig = HudConfig()
+    @Category(name = "Critter Safari", desc = "Tracking unique critters caught by your group")
+    var critterSafari: CritterSafariConfig = CritterSafariConfig()
 
     @Expose
     @Category(name = "Accessibility", desc = "Language and ease of use")

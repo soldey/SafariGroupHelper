@@ -1,18 +1,15 @@
 {
   "_comment": "Source language. Values may use § colour codes and %s / %1$s placeholders; %% is a literal percent sign. Copy this file to <code>.json to add a language - anything you leave out falls back to these strings.",
-
   "biome.cavern": "Cavern",
   "biome.forest": "Forest",
   "biome.haunted": "Haunted",
   "biome.icy": "Icy",
-
   "enum.otherBiomes.OFF": "Off",
   "enum.otherBiomes.COMPACT": "Progress only",
   "enum.otherBiomes.FULL": "Full critter list",
   "enum.biomeSelect.SAFARI_ONLY": "Critter Safari only",
   "enum.biomeSelect.SAFARI_AND_CANYON": "Safari + Torrhus Canyon",
   "enum.biomeSelect.EVERYWHERE": "Everywhere",
-
   "hud.switchBiome": "§e[Switch biome]",
   "hud.resetRun": "§e[Reset run]",
   "hud.resetConfirm": "§c[Click again to reset]",
@@ -27,12 +24,10 @@
   "hud.time": "§7Time §e%s",
   "hud.catches": "§7Catches §f%1$d §8(%2$d repeats)",
   "hud.pb": "§7PB §d%s",
-
   "hud.block.my_biome": "My biome",
   "hud.block.other_biomes": "Other biomes",
   "hud.block.total_progress": "Total progress",
   "hud.block.run_info": "Run info / timer",
-
   "chat.prefix": "§3[SGH] ",
   "chat.runStarted": "§aRun started. §7Biome: %s",
   "chat.runResumed": "§7Resumed run at §e%s",
@@ -44,7 +39,6 @@
   "chat.personalBestKept": "§7Personal best stays at §e%1$s §c(+%2$s)",
   "chat.runReset": "§eRun progress reset.",
   "chat.unparsed": "§cunparsed: %s",
-
   "command.on": "§aON",
   "command.off": "§cOFF",
   "command.unknown": "unknown",
@@ -67,7 +61,6 @@
   "command.dump.sidebarEmpty": "§csidebar: empty",
   "command.dump.sidebar": "§7sidebar (%d lines):",
   "command.dump.sidebarLine": "§8  '%s'",
-
   "screen.done": "Done",
   "screen.biomePicker.title": "§bPick your biome",
   "screen.biomePicker.optionPlain": "%s",
@@ -77,5 +70,11 @@
   "screen.hudEditor.hintDrag": "§7Drag a block to move it",
   "screen.hudEditor.hintScroll": "§7Scroll over a block to resize it",
   "screen.hudEditor.hintRightClick": "§7Right click a block to hide or show it",
-  "screen.hudEditor.hintKeys": "§7R - reset all positions, Esc - done"
+  "screen.hudEditor.hintKeys": "§7R - reset all positions, Esc - done",
+  "chat.runResetInSafari": "§eRun progress reset. §7This run no longer counts for the personal best.",
+  "chat.completionNotCounted": "§7The run was reset partway, so it does not count for the personal best.",
+  "runHistory.empty": "§7No runs recorded yet.",
+  "runHistory.line": "§8%1$d. §7%2$s §8| §b%3$d/%4$d §8| §e%5$s%6$s",
+  "runHistory.complete": " §a✔",
+  "runHistory.invalid": " §c(reset)"
 }

@@ -39,7 +39,7 @@ object HudContent {
         if (!block.pos.enabled) return BlockContent(emptyList())
         val config = ConfigManager.config
         val showProgress = editorPreview || SafariSession.progressVisible
-        val selectAllowed = editorPreview || LocationTracker.biomeSelectAllowed(config.hud.biomeSelectVisibility)
+        val selectAllowed = editorPreview || LocationTracker.biomeSelectAllowed(config.critterSafari.hud.biomeSelectVisibility)
         // Clickable lines only exist while a container screen is open, so they cannot be hit by
         // accident while hunting.
         val buttonsVisible = inInventory
@@ -54,7 +54,7 @@ object HudContent {
 
     private fun myBiome(showProgress: Boolean, selectAllowed: Boolean, showButton: Boolean): BlockContent {
         if (!showProgress && !selectAllowed) return BlockContent(emptyList())
-        val biome = ConfigManager.config.general.selectedBiome
+        val biome = ConfigManager.config.critterSafari.selectedBiome
         val lines = ArrayList<Component>()
         lines += if (showProgress) {
             tr("hud.biomeHeader", biome.colorCode, biome.translatedName, SafariSession.uniques(biome), biome.total)
@@ -83,8 +83,8 @@ object HudContent {
 
     private fun otherBiomes(): BlockContent {
         val config = ConfigManager.config
-        if (config.hud.otherBiomesMode == OtherBiomesMode.OFF) return BlockContent(emptyList())
-        val others = CritterBiome.entries.filter { it != config.general.selectedBiome }
+        if (config.critterSafari.hud.otherBiomesMode == OtherBiomesMode.OFF) return BlockContent(emptyList())
+        val others = CritterBiome.entries.filter { it != config.critterSafari.selectedBiome }
         val lines = ArrayList<Component>()
         lines += tr("hud.otherBiomes")
         for (biome in others) {
@@ -95,7 +95,7 @@ object HudContent {
                 SafariSession.uniques(biome),
                 biome.total,
             )
-            if (config.hud.otherBiomesMode == OtherBiomesMode.FULL) {
+            if (config.critterSafari.hud.otherBiomesMode == OtherBiomesMode.FULL) {
                 for (critter in biome.critters) lines += critterLine(critter)
             }
         }

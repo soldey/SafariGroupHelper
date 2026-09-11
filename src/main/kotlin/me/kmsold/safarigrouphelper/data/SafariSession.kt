@@ -21,6 +21,8 @@ data class SessionState(
     var leftAt: Long = 0L,
     var completedAt: Long = 0L,
     var completionAnnounced: Boolean = false,
+    /** Cleared by a mid-run reset: such a run must not set a personal best. */
+    var validForPersonalBest: Boolean = true,
     var totalCatches: Int = 0,
     var catches: MutableMap<String, CatchEntry> = LinkedHashMap(),
 )
@@ -89,6 +91,17 @@ object SafariSession {
     }
 
     val isActive: Boolean get() = state.active
+
+    val validForPersonalBest: Boolean get() = state.validForPersonalBest
+
+    /**
+     * Marks the current run as not comparable. Used when the run is reset while still inside the
+     * safari: the timer restarts, but the capsules already spent make the time meaningless.
+     */
+    fun invalidateForPersonalBest() {
+        state.validForPersonalBest = false
+        markDirty()
+    }
 
     /**
      * Whether run progress may be put on screen. Progress is a Critter Safari thing: outside of

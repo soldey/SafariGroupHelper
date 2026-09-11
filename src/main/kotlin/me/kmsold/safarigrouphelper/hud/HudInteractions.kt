@@ -3,7 +3,6 @@ package me.kmsold.safarigrouphelper.hud
 import me.kmsold.safarigrouphelper.data.LocationTracker
 import me.kmsold.safarigrouphelper.data.SafariSession
 import me.kmsold.safarigrouphelper.util.ChatOut
-import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 
@@ -36,8 +35,15 @@ object HudInteractions {
     /** Clears the run and restarts the timer right away when we are still inside the safari. */
     fun resetRunNow() {
         SafariSession.reset()
-        if (LocationTracker.inSafari) SafariSession.startOrResume()
+        if (LocationTracker.inSafari) {
+            SafariSession.startOrResume()
+            // Resetting without leaving the safari means capsules are already gone, so the new
+            // run cannot be measured against the others.
+            SafariSession.invalidateForPersonalBest()
+            ChatOut.send("chat.runResetInSafari")
+        } else {
+            ChatOut.send("chat.runReset")
+        }
         SafariSession.save()
-        ChatOut.send("Run progress reset.", ChatFormatting.YELLOW)
     }
 }

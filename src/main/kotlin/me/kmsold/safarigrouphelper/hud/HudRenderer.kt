@@ -62,7 +62,7 @@ object HudRenderer {
         matrix.translate(x, y)
         matrix.scale(scale, scale)
 
-        if (ConfigManager.config.hud.hudBackground || editorPreview) {
+        if (ConfigManager.config.critterSafari.hud.hudBackground || editorPreview) {
             graphics.fill(0, 0, innerWidth + PADDING * 2, innerHeight + PADDING * 2, BACKGROUND_COLOR)
         }
         content.lines.forEachIndexed { index, line ->
