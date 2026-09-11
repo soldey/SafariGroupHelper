@@ -25,7 +25,8 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.resources.Identifier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -74,18 +75,19 @@ object SafariGroupHelper : ClientModInitializer {
 
     private fun registerHud() {
         HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, id("hud")) { graphics, _ ->
-            // This layer sits under any open screen. Container screens are handled by the screen
-            // hook instead, which draws on top so the HUD buttons stay clickable; our own screens
-            // draw the HUD themselves. Everything else - the pause menu, chat - keeps it behind.
+            // This layer sits under any open screen. The player's own inventory is handled by the
+            // screen hook instead, which draws on top so the HUD buttons stay clickable, and our
+            // own screens draw the HUD themselves. Everything else - the pause menu, chat, and any
+            // chest or NPC menu - keeps the HUD behind it.
             val screen = Minecraft.getInstance().screen
-            val drawnElsewhere = screen is AbstractContainerScreen<*> || screen.isOwnScreen()
+            val drawnElsewhere = screen.isPlayerInventory() || screen.isOwnScreen()
             if (!drawnElsewhere) HudRenderer.render(graphics, inInventory = false)
         }
     }
 
     private fun registerScreenHooks() {
         ScreenEvents.AFTER_INIT.register { client, screen, _, _ ->
-            if (screen !is AbstractContainerScreen<*>) return@register
+            if (!screen.isPlayerInventory()) return@register
 
             ScreenEvents.afterExtract(screen).register { _, graphics, _, _, _ ->
                 HudRenderer.render(graphics, inInventory = true)
@@ -119,6 +121,13 @@ object SafariGroupHelper : ClientModInitializer {
 
     private fun Screen?.isOwnScreen(): Boolean =
         this is HudEditorScreen || this is BiomeSelectScreen || this is MoulConfigScreenComponent
+
+    /**
+     * Only the player's own inventory, not chests or the NPC menus Hypixel opens - those are just
+     * as much in the way as the pause menu is.
+     */
+    private fun Screen?.isPlayerInventory(): Boolean =
+        this is InventoryScreen || this is CreativeModeInventoryScreen
 
     private fun onTick() {
         queuedScreen?.let {
