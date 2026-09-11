@@ -74,19 +74,21 @@ object SafariGroupHelper : ClientModInitializer {
 
     private fun registerHud() {
         HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, id("hud")) { graphics, _ ->
-            // While a screen is open we draw through the screen hook instead, on top of it.
-            if (Minecraft.getInstance().screen == null) {
-                HudRenderer.render(graphics, inInventory = false)
-            }
+            // This layer sits under any open screen. Container screens are handled by the screen
+            // hook instead, which draws on top so the HUD buttons stay clickable; our own screens
+            // draw the HUD themselves. Everything else - the pause menu, chat - keeps it behind.
+            val screen = Minecraft.getInstance().screen
+            val drawnElsewhere = screen is AbstractContainerScreen<*> || screen.isOwnScreen()
+            if (!drawnElsewhere) HudRenderer.render(graphics, inInventory = false)
         }
     }
 
     private fun registerScreenHooks() {
         ScreenEvents.AFTER_INIT.register { client, screen, _, _ ->
-            if (screen.isOwnScreen()) return@register
+            if (screen !is AbstractContainerScreen<*>) return@register
 
-            ScreenEvents.afterExtract(screen).register { currentScreen, graphics, _, _, _ ->
-                HudRenderer.render(graphics, inInventory = currentScreen is AbstractContainerScreen<*>)
+            ScreenEvents.afterExtract(screen).register { _, graphics, _, _, _ ->
+                HudRenderer.render(graphics, inInventory = true)
             }
 
             ScreenMouseEvents.allowMouseClick(screen).register { currentScreen, event ->
@@ -115,7 +117,7 @@ object SafariGroupHelper : ClientModInitializer {
         }
     }
 
-    private fun Screen.isOwnScreen(): Boolean =
+    private fun Screen?.isOwnScreen(): Boolean =
         this is HudEditorScreen || this is BiomeSelectScreen || this is MoulConfigScreenComponent
 
     private fun onTick() {
