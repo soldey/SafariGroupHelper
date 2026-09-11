@@ -125,9 +125,10 @@ tasks.jar {
 // Copied under a different name so the `exclude("/LICENSE")` below, which drops MoulConfig's
 // copy, does not also drop ours - Gradle matches excludes against the source name.
 val licenseForJar = tasks.register<Copy>("licenseForJar") {
-    from("LICENSE")
+    // LGPL 3.0 is the GPL plus extra permissions, so both texts travel with the jar.
+    from("LICENSE") { rename { "LICENSE.txt" } }
+    from("COPYING") { rename { "COPYING.txt" } }
     into(layout.buildDirectory.dir("license"))
-    rename { "LICENSE.txt" }
 }
 
 // The shadowed jar is the real mod jar; the plain one has no bundled dependencies.
