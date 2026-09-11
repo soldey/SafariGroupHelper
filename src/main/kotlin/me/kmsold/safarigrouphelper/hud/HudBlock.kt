@@ -21,6 +21,17 @@ enum class HudBlock(
     val label: String get() = Localization.trOr("hud.block.$id", fallbackLabel)
 
     val pos: HudPos get() = ConfigManager.config.position(id, defaultX, defaultY)
+
+    /** Switched in Critter Safari -> Hud, not in the position editor. */
+    val visible: Boolean
+        get() = ConfigManager.config.critterSafari.hud.let {
+            when (this) {
+                MY_BIOME -> it.showMyBiome
+                OTHER_BIOMES -> it.showOtherBiomes
+                TOTAL_PROGRESS -> it.showTotalProgress
+                RUN_INFO -> it.showRunInfo
+            }
+        }
 }
 
 /** A rectangle in scaled GUI coordinates. */

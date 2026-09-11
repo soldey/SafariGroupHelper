@@ -26,11 +26,15 @@ class HudEditorScreen(private val parent: Screen? = null) : Screen(tr("screen.hu
 
         for ((block, rect) in HudRenderer.lastBounds) {
             val hovered = rect.contains(mouseX.toDouble(), mouseY.toDouble())
-            val color = if (hovered) 0xFFFFFF55.toInt() else 0xFF55FFFF.toInt()
+            val color = when {
+                !block.visible -> 0xFF888888.toInt()
+                hovered -> 0xFFFFFF55.toInt()
+                else -> 0xFF55FFFF.toInt()
+            }
             drawOutline(graphics, rect, color)
             graphics.text(
                 font,
-                text(block.label, ChatFormatting.GRAY),
+                text(if (block.visible) block.label else "${block.label} (off)", ChatFormatting.GRAY),
                 rect.x.toInt(),
                 (rect.y - font.lineHeight - 1).toInt().coerceAtLeast(0),
                 0xFFFFFFFF.toInt(),
@@ -41,7 +45,6 @@ class HudEditorScreen(private val parent: Screen? = null) : Screen(tr("screen.hu
         val hints = listOf(
             "screen.hudEditor.hintDrag",
             "screen.hudEditor.hintScroll",
-            "screen.hudEditor.hintRightClick",
             "screen.hudEditor.hintKeys",
         )
         hints.forEachIndexed { index, hint ->
@@ -70,11 +73,6 @@ class HudEditorScreen(private val parent: Screen? = null) : Screen(tr("screen.hu
     override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
         val block = blockAt(event.x(), event.y())
         if (block != null) {
-            if (event.button() == 1) {
-                block.pos.enabled = !block.pos.enabled
-                ConfigManager.markDirty()
-                return true
-            }
             dragging = block
             val rect = HudRenderer.lastBounds[block] ?: return true
             dragOffsetX = (event.x() - rect.x).toFloat()

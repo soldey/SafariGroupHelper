@@ -81,7 +81,33 @@ object ConfigManager {
             }
             json.remove("hud")?.let { critterSafari.add("hud", it) }
         }
+        migrateBlockVisibility(json)
         return json
+    }
+
+    /**
+     * Hiding a block used to be a right click in the position editor, stored next to its
+     * coordinates. It is a normal setting now, so whatever was hidden back then stays hidden -
+     * and can finally be switched back on.
+     */
+    private fun migrateBlockVisibility(json: JsonObject) {
+        val positions = json.getAsJsonObject("positions") ?: return
+        val blocks = mapOf(
+            "my_biome" to "showMyBiome",
+            "other_biomes" to "showOtherBiomes",
+            "total_progress" to "showTotalProgress",
+            "run_info" to "showRunInfo",
+        )
+        val hidden = blocks.filter { (id, _) ->
+            positions.getAsJsonObject(id)?.get("enabled")?.let { !it.asBoolean } == true
+        }
+        if (hidden.isEmpty()) return
+        SafariGroupHelper.logger.info("Moving {} hidden HUD blocks into the settings", hidden.size)
+        val critterSafari = json.getAsJsonObject("critterSafari") ?: JsonObject().also {
+            json.add("critterSafari", it)
+        }
+        val hud = critterSafari.getAsJsonObject("hud") ?: JsonObject().also { critterSafari.add("hud", it) }
+        for ((_, option) in hidden) hud.addProperty(option, false)
     }
 
     private fun migrateFlatConfig(old: JsonObject): JsonObject {
