@@ -1,0 +1,106 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    idea
+    java
+    id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT"
+    kotlin("jvm") version "2.4.10"
+}
+
+val minecraftVersion: String by project
+val minecraftDependency: String by project
+val fabricLoaderVersion: String by project
+val fabricApiVersion: String by project
+val fabricKotlinVersion: String by project
+val javaVersion: String by project
+val modMenuVersion: String by project
+val hypixelModApiVersion: String by project
+val hypixelModApiFabricVersion: String by project
+val modVersion: String by project
+val mavenGroup: String by project
+val archivesBaseName: String by project
+
+group = mavenGroup
+version = modVersion
+base.archivesName.set(archivesBaseName)
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(javaVersion.toInt()))
+    withSourcesJar()
+}
+
+repositories {
+    mavenCentral()
+    maven("https://maven.fabricmc.net") {
+        content { includeGroupAndSubgroups("net.fabricmc") }
+    }
+    maven("https://api.modrinth.com/maven") {
+        content { includeGroup("maven.modrinth") }
+    }
+    maven("https://repo.hypixel.net/repository/Hypixel") {
+        content { includeGroup("net.hypixel") }
+    }
+}
+
+dependencies {
+    minecraft("com.mojang:minecraft:$minecraftVersion")
+
+    implementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
+    implementation("net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
+    implementation("net.fabricmc:fabric-language-kotlin:$fabricKotlinVersion")
+
+    // Optional at runtime: the modmenu entrypoint is only loaded when ModMenu is installed.
+    implementation("maven.modrinth:modmenu:$modMenuVersion")
+
+    // Optional at runtime: provided by the hypixel-mod-api mod when the player has it installed.
+    compileOnly("net.hypixel:mod-api:$hypixelModApiVersion")
+    runtimeOnly("maven.modrinth:hypixel-mod-api:$hypixelModApiFabricVersion")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.14.4")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+loom {
+    runs {
+        named("client") {
+            isIdeConfigGenerated = true
+            vmArgs("-Xmx2G")
+        }
+        removeIf { it.name == "server" }
+    }
+}
+
+tasks.processResources {
+    val props = mapOf(
+        "version" to version,
+        "minecraft" to minecraftDependency,
+        "fabricLoader" to fabricLoaderVersion,
+        "fabricKotlin" to fabricKotlinVersion,
+    )
+    inputs.properties(props)
+    filesMatching("fabric.mod.json") {
+        expand(props)
+    }
+}
+
+tasks.withType<KotlinCompile> {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.fromTarget(javaVersion))
+    }
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+    options.release.set(javaVersion.toInt())
+}
+
+tasks.jar {
+    from("LICENSE") {
+        rename { "${it}_$archivesBaseName" }
+    }
+}

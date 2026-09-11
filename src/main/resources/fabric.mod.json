@@ -1,0 +1,33 @@
+{
+    "schemaVersion": 1,
+    "id": "safarigrouphelper",
+    "version": "${version}",
+    "name": "Safari Group Helper",
+    "description": "Tracks unique critters caught by your group in the Hypixel SkyBlock Critter Safari.",
+    "authors": [
+        "kmsold"
+    ],
+    "contact": {},
+    "license": "MIT",
+    "environment": "client",
+    "entrypoints": {
+        "client": [
+            {
+                "adapter": "kotlin",
+                "value": "me.kmsold.safarigrouphelper.SafariGroupHelper"
+            }
+        ],
+        "modmenu": [
+            "me.kmsold.safarigrouphelper.compat.ModMenuIntegration"
+        ]
+    },
+    "depends": {
+        "fabricloader": ">=${fabricLoader}",
+        "fabric-api": "*",
+        "fabric-language-kotlin": ">=${fabricKotlin}",
+        "minecraft": "${minecraft}"
+    },
+    "recommends": {
+        "hypixel-mod-api": "*"
+    }
+}
