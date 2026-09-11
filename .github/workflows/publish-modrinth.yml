@@ -1,0 +1,52 @@
+name: Publish to Modrinth
+
+# Publishes a version that already exists as a GitHub release. Useful for backfilling versions
+# that were released before Modrinth was set up, or for retrying after an API hiccup.
+# Run it from the Actions tab and give it a version like 1.5.1.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to publish, without the leading v (for example 1.5.1)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      # The tag, so mc-publish reads the fabric.mod.json that shipped with this version.
+      - uses: actions/checkout@v7
+        with:
+          ref: v${{ inputs.version }}
+
+      - name: Fetch the released jar and its notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          mkdir -p build/libs
+          gh release download "v$VERSION" \
+            --pattern "safari-group-helper-$VERSION.jar" \
+            --dir build/libs
+          gh release view "v$VERSION" --json body --jq .body > /tmp/notes.md
+
+      - name: Publish to Modrinth
+        uses: Kira-NT/mc-publish@v3.3.1
+        with:
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          files: build/libs/safari-group-helper-${{ inputs.version }}.jar
+          name: Safari Group Helper ${{ inputs.version }}
+          version: ${{ inputs.version }}
+          version-type: release
+          changelog-file: /tmp/notes.md
+          loaders: fabric
+          game-versions: |
+            26.1
+            26.1.1
+            26.1.2
+          java: 25
