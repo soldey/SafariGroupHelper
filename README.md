@@ -19,12 +19,14 @@ sidebar plus the chat message you get when entering the safari.
 * **Critter list for your biome** with ✔/✖ marks and a repeat counter (`x3`).
 * **Progress of the other biomes** in a single block: off / just `3/9` / full critter list.
 * **Overall progress** from 0 to 100% with a bar (37 critters in total).
-* **Run timer** plus catch and repeat counts.
+* **Run timer** plus catch and repeat counts, with a `[Reset run]` button that asks for a
+  second click before it throws the run away.
 * **Personal best**: on 100% across all biomes the mod prints your run time in chat
   (client side only, nothing is sent to the server) and stores your best result.
 * **Draggable HUD blocks** - `/sgh gui`, drag with the mouse, scroll to resize,
   right click to hide a block, `R` resets every position.
 * **Progress is only shown inside the Critter Safari**, and chat is only parsed there.
+* **Settings with categories and descriptions**, from ModMenu or `/sgh settings`.
 
 ## Commands
 

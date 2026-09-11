@@ -11,12 +11,18 @@ import me.kmsold.safarigrouphelper.util.text
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 
-const val SWITCH_BIOME_LABEL = "[Switch biome]"
+/** Things a HUD line can do when clicked. */
+enum class HudAction {
+    SWITCH_BIOME,
+    RESET_RUN,
+}
 
-/** Text of one block plus the index of its clickable "switch biome" line, if it has one. */
+/** A clickable line inside a block. */
+data class HudButton(val lineIndex: Int, val action: HudAction)
+
 data class BlockContent(
     val lines: List<Component>,
-    val buttonLineIndex: Int = -1,
+    val buttons: List<HudButton> = emptyList(),
 ) {
     val isEmpty: Boolean get() = lines.isEmpty()
 }
@@ -34,13 +40,13 @@ object HudContent {
         val config = ConfigManager.config
         val showProgress = editorPreview || LocationTracker.inSafari
         val selectAllowed = editorPreview || LocationTracker.biomeSelectAllowed(config.biomeSelectVisibility)
-        val showButton = selectAllowed && (inInventory || !config.switchButtonOnlyInInventory)
+        val buttonsVisible = inInventory || !config.switchButtonOnlyInInventory
 
         return when (block) {
-            HudBlock.MY_BIOME -> myBiome(showProgress, selectAllowed, showButton)
+            HudBlock.MY_BIOME -> myBiome(showProgress, selectAllowed, selectAllowed && buttonsVisible)
             HudBlock.OTHER_BIOMES -> if (showProgress) otherBiomes() else BlockContent(emptyList())
             HudBlock.TOTAL_PROGRESS -> if (showProgress) totalProgress() else BlockContent(emptyList())
-            HudBlock.RUN_INFO -> if (showProgress) runInfo() else BlockContent(emptyList())
+            HudBlock.RUN_INFO -> if (showProgress) runInfo(buttonsVisible) else BlockContent(emptyList())
         }
     }
 
@@ -52,12 +58,12 @@ object HudContent {
         if (showProgress) {
             for (critter in biome.critters) lines += critterLine(critter)
         }
-        var buttonIndex = -1
+        val buttons = ArrayList<HudButton>()
         if (showButton) {
-            buttonIndex = lines.size
-            lines += text(SWITCH_BIOME_LABEL, ChatFormatting.YELLOW)
+            buttons += HudButton(lines.size, HudAction.SWITCH_BIOME)
+            lines += text("[Switch biome]", ChatFormatting.YELLOW)
         }
-        return BlockContent(lines, buttonIndex)
+        return BlockContent(lines, buttons)
     }
 
     /** Outside the safari only the biome name is shown - progress is a safari-only thing. */
@@ -122,7 +128,7 @@ object HudContent {
         )
     }
 
-    private fun runInfo(): BlockContent {
+    private fun runInfo(showButton: Boolean): BlockContent {
         val lines = ArrayList<Component>()
         lines += text("")
             .append(text("Time ", ChatFormatting.GRAY))
@@ -136,6 +142,15 @@ object HudContent {
                 .append(text("PB ", ChatFormatting.GRAY))
                 .append(text(TimeFormat.clock(it), ChatFormatting.LIGHT_PURPLE))
         }
-        return BlockContent(lines)
+        val buttons = ArrayList<HudButton>()
+        if (showButton) {
+            buttons += HudButton(lines.size, HudAction.RESET_RUN)
+            lines += if (HudInteractions.resetPending) {
+                text("[Click again to reset]", ChatFormatting.RED)
+            } else {
+                text("[Reset run]", ChatFormatting.YELLOW)
+            }
+        }
+        return BlockContent(lines, buttons)
     }
 }

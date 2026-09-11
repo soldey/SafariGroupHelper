@@ -18,13 +18,15 @@ object HudRenderer {
     /** Bounds of every block as drawn during the last frame, in scaled GUI coordinates. */
     val lastBounds: MutableMap<HudBlock, Rect> = LinkedHashMap()
 
-    /** Bounds of the "switch biome" line, or null when it was not drawn. */
-    var switchButtonBounds: Rect? = null
-        private set
+    /** Clickable lines drawn during the last frame. */
+    val buttonBounds: MutableList<Pair<Rect, HudAction>> = ArrayList()
+
+    fun actionAt(mouseX: Double, mouseY: Double): HudAction? =
+        buttonBounds.lastOrNull { it.first.contains(mouseX, mouseY) }?.second
 
     fun render(graphics: GuiGraphicsExtractor, inInventory: Boolean, editorPreview: Boolean = false) {
         lastBounds.clear()
-        switchButtonBounds = null
+        buttonBounds.clear()
         if (!ConfigManager.config.enabled) return
 
         for (block in HudBlock.entries) {
@@ -69,13 +71,14 @@ object HudRenderer {
 
         matrix.popMatrix()
 
-        if (content.buttonLineIndex >= 0) {
-            switchButtonBounds = Rect(
+        for (button in content.buttons) {
+            val line = content.lines.getOrNull(button.lineIndex) ?: continue
+            buttonBounds += Rect(
                 x + PADDING * scale,
-                y + (PADDING + content.buttonLineIndex * lineHeight) * scale,
-                font.width(content.lines[content.buttonLineIndex]) * scale,
+                y + (PADDING + button.lineIndex * lineHeight) * scale,
+                font.width(line) * scale,
                 font.lineHeight * scale,
-            )
+            ) to button.action
         }
     }
 }

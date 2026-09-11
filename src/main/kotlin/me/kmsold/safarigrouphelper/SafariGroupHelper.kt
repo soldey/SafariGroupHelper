@@ -9,6 +9,7 @@ import me.kmsold.safarigrouphelper.data.SafariSession
 import me.kmsold.safarigrouphelper.data.SafariStats
 import me.kmsold.safarigrouphelper.hud.BiomeSelectScreen
 import me.kmsold.safarigrouphelper.hud.HudEditorScreen
+import me.kmsold.safarigrouphelper.hud.HudInteractions
 import me.kmsold.safarigrouphelper.hud.HudRenderer
 import me.kmsold.safarigrouphelper.hud.SghConfigScreen
 import net.fabricmc.api.ClientModInitializer
@@ -86,10 +87,9 @@ object SafariGroupHelper : ClientModInitializer {
             }
 
             ScreenMouseEvents.allowMouseClick(screen).register { currentScreen, event ->
-                val bounds = HudRenderer.switchButtonBounds
-                val hit = event.button() == 0 && bounds != null && bounds.contains(event.x(), event.y())
-                if (hit) {
-                    client.setScreen(BiomeSelectScreen(currentScreen))
+                val action = if (event.button() == 0) HudRenderer.actionAt(event.x(), event.y()) else null
+                if (action != null) {
+                    HudInteractions.click(action, currentScreen)
                     false
                 } else {
                     true

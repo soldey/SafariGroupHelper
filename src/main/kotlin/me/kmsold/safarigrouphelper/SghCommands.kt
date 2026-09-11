@@ -9,6 +9,7 @@ import me.kmsold.safarigrouphelper.data.SafariSession
 import me.kmsold.safarigrouphelper.data.SafariStats
 import me.kmsold.safarigrouphelper.hud.BiomeSelectScreen
 import me.kmsold.safarigrouphelper.hud.HudEditorScreen
+import me.kmsold.safarigrouphelper.hud.HudInteractions
 import me.kmsold.safarigrouphelper.hud.SghConfigScreen
 import me.kmsold.safarigrouphelper.util.ChatOut
 import me.kmsold.safarigrouphelper.util.TimeFormat
@@ -117,9 +118,7 @@ object SghCommands {
     }
 
     private fun resetRun(): Int {
-        SafariSession.reset()
-        SafariSession.save()
-        ChatOut.send("Run progress reset.", ChatFormatting.YELLOW)
+        HudInteractions.resetRunNow()
         return 1
     }
 
