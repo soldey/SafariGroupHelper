@@ -1,6 +1,7 @@
 package me.kmsold.safarigrouphelper.config
 
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
 import me.kmsold.safarigrouphelper.SafariGroupHelper
 import net.fabricmc.loader.api.FabricLoader
 import java.nio.file.Files
@@ -11,12 +12,15 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
 /**
- * Loads and saves [SghConfig]. Saving is debounced through [markDirty] so that recording a catch
- * every few seconds does not hit the disk on every single chat line.
+ * Loads and saves [SghConfig]. Saving is debounced through [markDirty] so that dragging a HUD
+ * block does not hit the disk on every frame.
  */
 object ConfigManager {
 
-    private val gson = GsonBuilder().setPrettyPrinting().create()
+    private val gson = GsonBuilder()
+        .setPrettyPrinting()
+        .excludeFieldsWithoutExposeAnnotation()
+        .create()
 
     val configDir: Path by lazy {
         FabricLoader.getInstance().configDir.resolve("safarigrouphelper").also { it.createDirectories() }
@@ -31,17 +35,49 @@ object ConfigManager {
     private var lastSave = 0L
 
     fun load() {
-        config = if (configFile.exists()) {
-            runCatching { gson.fromJson(configFile.readText(), SghConfig::class.java) }
-                .onFailure { SafariGroupHelper.logger.error("Could not read config.json, using defaults", it) }
-                .getOrNull() ?: SghConfig()
-        } else {
-            SghConfig()
-        }
-        // Gson happily leaves non-null fields null when a key is missing from an older file.
-        @Suppress("SENSELESS_COMPARISON")
-        if (config.positions == null) config.positions = LinkedHashMap()
+        config = readConfig() ?: SghConfig()
         save()
+    }
+
+    private fun readConfig(): SghConfig? {
+        if (!configFile.exists()) return null
+        val raw = runCatching { gson.fromJson(configFile.readText(), JsonObject::class.java) }
+            .onFailure { SafariGroupHelper.logger.error("Could not read config.json, using defaults", it) }
+            .getOrNull() ?: return null
+
+        // 1.0.0 kept every option at the top level; move those onto the categorised layout.
+        val migrated = if (raw.has("selectedBiome") && !raw.has("general")) migrateFlatConfig(raw) else raw
+        return runCatching { gson.fromJson(migrated, SghConfig::class.java) }
+            .onFailure { SafariGroupHelper.logger.error("Could not parse config.json, using defaults", it) }
+            .getOrNull()
+    }
+
+    private fun migrateFlatConfig(old: JsonObject): JsonObject {
+        SafariGroupHelper.logger.info("Migrating the 1.0.0 config layout")
+        val new = JsonObject()
+        val general = JsonObject()
+        val hud = JsonObject()
+        val chat = JsonObject()
+
+        fun move(key: String, target: JsonObject, newKey: String = key) {
+            old.get(key)?.let { target.add(newKey, it) }
+        }
+
+        move("enabled", general)
+        move("selectedBiome", general)
+        move("announceNewUniques", general)
+        move("otherBiomesMode", hud)
+        move("biomeSelectVisibility", hud)
+        move("switchButtonOnlyInInventory", hud)
+        move("hudBackground", hud)
+        move("parseOnlyInSafari", chat)
+        move("debugChatParsing", chat)
+
+        new.add("general", general)
+        new.add("hud", hud)
+        new.add("chat", chat)
+        old.get("positions")?.let { new.add("positions", it) }
+        return new
     }
 
     fun markDirty() {

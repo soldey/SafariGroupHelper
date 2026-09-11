@@ -1,9 +1,11 @@
 package me.kmsold.safarigrouphelper
 
+import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import me.kmsold.safarigrouphelper.chat.ChatPatterns
 import me.kmsold.safarigrouphelper.chat.CritterChatParser
 import me.kmsold.safarigrouphelper.compat.HypixelLocationApi
 import me.kmsold.safarigrouphelper.config.ConfigManager
+import me.kmsold.safarigrouphelper.config.SghConfigGui
 import me.kmsold.safarigrouphelper.data.LocationTracker
 import me.kmsold.safarigrouphelper.data.SafariSession
 import me.kmsold.safarigrouphelper.data.SafariStats
@@ -11,7 +13,6 @@ import me.kmsold.safarigrouphelper.hud.BiomeSelectScreen
 import me.kmsold.safarigrouphelper.hud.HudEditorScreen
 import me.kmsold.safarigrouphelper.hud.HudInteractions
 import me.kmsold.safarigrouphelper.hud.HudRenderer
-import me.kmsold.safarigrouphelper.hud.SghConfigScreen
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
@@ -113,7 +114,7 @@ object SafariGroupHelper : ClientModInitializer {
     }
 
     private fun Screen.isOwnScreen(): Boolean =
-        this is HudEditorScreen || this is BiomeSelectScreen || this is SghConfigScreen
+        this is HudEditorScreen || this is BiomeSelectScreen || this is MoulConfigScreenComponent
 
     private fun onTick() {
         queuedScreen?.let {

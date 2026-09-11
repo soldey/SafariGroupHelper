@@ -39,8 +39,8 @@ object HudContent {
         if (!block.pos.enabled) return BlockContent(emptyList())
         val config = ConfigManager.config
         val showProgress = editorPreview || LocationTracker.inSafari
-        val selectAllowed = editorPreview || LocationTracker.biomeSelectAllowed(config.biomeSelectVisibility)
-        val buttonsVisible = inInventory || !config.switchButtonOnlyInInventory
+        val selectAllowed = editorPreview || LocationTracker.biomeSelectAllowed(config.hud.biomeSelectVisibility)
+        val buttonsVisible = inInventory || !config.hud.switchButtonOnlyInInventory
 
         return when (block) {
             HudBlock.MY_BIOME -> myBiome(showProgress, selectAllowed, selectAllowed && buttonsVisible)
@@ -52,7 +52,7 @@ object HudContent {
 
     private fun myBiome(showProgress: Boolean, selectAllowed: Boolean, showButton: Boolean): BlockContent {
         if (!showProgress && !selectAllowed) return BlockContent(emptyList())
-        val biome = ConfigManager.config.selectedBiome
+        val biome = ConfigManager.config.general.selectedBiome
         val lines = ArrayList<Component>()
         lines += header(biome, showProgress)
         if (showProgress) {
@@ -90,15 +90,15 @@ object HudContent {
 
     private fun otherBiomes(): BlockContent {
         val config = ConfigManager.config
-        if (config.otherBiomesMode == OtherBiomesMode.OFF) return BlockContent(emptyList())
-        val others = CritterBiome.entries.filter { it != config.selectedBiome }
+        if (config.hud.otherBiomesMode == OtherBiomesMode.OFF) return BlockContent(emptyList())
+        val others = CritterBiome.entries.filter { it != config.general.selectedBiome }
         val lines = ArrayList<Component>()
         lines += text("Other biomes", ChatFormatting.GRAY, ChatFormatting.BOLD)
         for (biome in others) {
             lines += text("")
                 .append(text(biome.displayName, biome.formatting))
                 .append(text(" ${SafariSession.uniques(biome)}/${biome.total}", ChatFormatting.AQUA))
-            if (config.otherBiomesMode == OtherBiomesMode.FULL) {
+            if (config.hud.otherBiomesMode == OtherBiomesMode.FULL) {
                 for (critter in biome.critters) lines += critterLine(critter)
             }
         }

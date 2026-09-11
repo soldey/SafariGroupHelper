@@ -27,7 +27,7 @@ object HudRenderer {
     fun render(graphics: GuiGraphicsExtractor, inInventory: Boolean, editorPreview: Boolean = false) {
         lastBounds.clear()
         buttonBounds.clear()
-        if (!ConfigManager.config.enabled) return
+        if (!ConfigManager.config.general.enabled) return
 
         for (block in HudBlock.entries) {
             val content = HudContent.build(block, inInventory, editorPreview)
@@ -62,7 +62,7 @@ object HudRenderer {
         matrix.translate(x, y)
         matrix.scale(scale, scale)
 
-        if (ConfigManager.config.hudBackground || editorPreview) {
+        if (ConfigManager.config.hud.hudBackground || editorPreview) {
             graphics.fill(0, 0, innerWidth + PADDING * 2, innerHeight + PADDING * 2, BACKGROUND_COLOR)
         }
         content.lines.forEachIndexed { index, line ->

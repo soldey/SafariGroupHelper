@@ -19,14 +19,14 @@ class BiomeSelectScreen(private val parent: Screen?) : Screen(text("Pick your bi
         val buttonHeight = 20
         val startY = height / 2 - (CritterBiome.entries.size * (buttonHeight + 4)) / 2
         CritterBiome.entries.forEachIndexed { index, biome ->
-            val selected = biome == ConfigManager.config.selectedBiome
+            val selected = biome == ConfigManager.config.general.selectedBiome
             val label = text("")
                 .append(text(biome.displayName, biome.formatting))
                 .append(text(" ${SafariSession.uniques(biome)}/${biome.total}", ChatFormatting.GRAY))
                 .apply { if (selected) append(text(" (selected)", ChatFormatting.GREEN)) }
             addRenderableWidget(
                 Button.builder(label) {
-                    ConfigManager.config.selectedBiome = biome
+                    ConfigManager.config.general.selectedBiome = biome
                     ConfigManager.save()
                     rebuildWidgets()
                 }.bounds(width / 2 - buttonWidth / 2, startY + index * (buttonHeight + 4), buttonWidth, buttonHeight)

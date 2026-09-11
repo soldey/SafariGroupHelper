@@ -2,6 +2,7 @@ package me.kmsold.safarigrouphelper
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import me.kmsold.safarigrouphelper.config.ConfigManager
+import me.kmsold.safarigrouphelper.config.SghConfigGui
 import me.kmsold.safarigrouphelper.config.OtherBiomesMode
 import me.kmsold.safarigrouphelper.data.CritterBiome
 import me.kmsold.safarigrouphelper.data.LocationTracker
@@ -10,7 +11,6 @@ import me.kmsold.safarigrouphelper.data.SafariStats
 import me.kmsold.safarigrouphelper.hud.BiomeSelectScreen
 import me.kmsold.safarigrouphelper.hud.HudEditorScreen
 import me.kmsold.safarigrouphelper.hud.HudInteractions
-import me.kmsold.safarigrouphelper.hud.SghConfigScreen
 import me.kmsold.safarigrouphelper.util.ChatOut
 import me.kmsold.safarigrouphelper.util.TimeFormat
 import me.kmsold.safarigrouphelper.util.text
@@ -67,7 +67,7 @@ object SghCommands {
     }
 
     private fun openSettings(): Int {
-        SafariGroupHelper.openScreen(SghConfigScreen(null))
+        SafariGroupHelper.openScreen(SghConfigGui.createScreen())
         return 1
     }
 
@@ -85,7 +85,7 @@ object SghCommands {
             )
             return 0
         }
-        ConfigManager.config.selectedBiome = biome
+        ConfigManager.config.general.selectedBiome = biome
         ConfigManager.save()
         ChatOut.send(
             text("Biome set to ", ChatFormatting.GRAY)
@@ -108,7 +108,7 @@ object SghCommands {
             )
             return 0
         }
-        ConfigManager.config.otherBiomesMode = mode
+        ConfigManager.config.hud.otherBiomesMode = mode
         ConfigManager.save()
         ChatOut.send(
             text("Other biomes display: ", ChatFormatting.GRAY)
@@ -124,12 +124,12 @@ object SghCommands {
 
     private fun toggleDebug(): Int {
         val config = ConfigManager.config
-        config.debugChatParsing = !config.debugChatParsing
+        config.chat.debugChatParsing = !config.chat.debugChatParsing
         ConfigManager.save()
         ChatOut.send(
             text("Chat debug: ", ChatFormatting.GRAY)
                 .append(
-                    if (config.debugChatParsing) text("ON", ChatFormatting.GREEN)
+                    if (config.chat.debugChatParsing) text("ON", ChatFormatting.GREEN)
                     else text("OFF", ChatFormatting.RED),
                 )
                 .append(text(" (log: chat-debug.log)", ChatFormatting.DARK_GRAY)),
@@ -164,7 +164,7 @@ object SghCommands {
     }
 
     private fun printStatus(): Int {
-        val biome = ConfigManager.config.selectedBiome
+        val biome = ConfigManager.config.general.selectedBiome
         ChatOut.send(
             text("Area: ", ChatFormatting.GRAY)
                 .append(

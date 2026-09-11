@@ -5,6 +5,7 @@ plugins {
     idea
     java
     id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT"
+    id("com.gradleup.shadow") version "9.6.0"
     kotlin("jvm") version "2.4.10"
 }
 
@@ -14,6 +15,8 @@ val fabricLoaderVersion: String by project
 val fabricApiVersion: String by project
 val fabricKotlinVersion: String by project
 val javaVersion: String by project
+val moulConfigVersion: String by project
+val moulConfigMinecraftVersion: String by project
 val modMenuVersion: String by project
 val hypixelModApiVersion: String by project
 val hypixelModApiFabricVersion: String by project
@@ -41,6 +44,14 @@ repositories {
     maven("https://repo.hypixel.net/repository/Hypixel") {
         content { includeGroup("net.hypixel") }
     }
+    maven("https://maven.notenoughupdates.org/releases") {
+        content { includeGroupAndSubgroups("org.notenoughupdates") }
+    }
+}
+
+/** Bundled into the final jar and relocated, so it cannot clash with other mods' copies. */
+val shadowImpl: Configuration = configurations.create("shadowImpl") {
+    configurations.implementation.get().extendsFrom(this)
 }
 
 dependencies {
@@ -49,6 +60,12 @@ dependencies {
     implementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
     implementation("net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
     implementation("net.fabricmc:fabric-language-kotlin:$fabricKotlinVersion")
+
+    // The settings GUI, the same library SkyHanni uses.
+    shadowImpl("org.notenoughupdates.moulconfig:modern-$moulConfigMinecraftVersion:$moulConfigVersion") {
+        exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains.kotlinx")
+    }
 
     // Optional at runtime: the modmenu entrypoint is only loaded when ModMenu is installed.
     implementation("maven.modrinth:modmenu:$modMenuVersion")
@@ -104,3 +121,20 @@ tasks.jar {
         rename { "${it}_$archivesBaseName" }
     }
 }
+
+// The shadowed jar is the real mod jar; the plain one has no bundled dependencies.
+tasks.shadowJar {
+    archiveClassifier.set("")
+    configurations = listOf(shadowImpl)
+    exclude("META-INF/versions/**")
+    exclude("META-INF/*.kotlin_module")
+    mergeServiceFiles()
+    relocate("io.github.notenoughupdates.moulconfig", "me.kmsold.safarigrouphelper.deps.moulconfig")
+}
+
+tasks.jar {
+    archiveClassifier.set("nodeps")
+    destinationDirectory.set(layout.buildDirectory.dir("nodeps"))
+}
+
+tasks.assemble { dependsOn(tasks.shadowJar) }

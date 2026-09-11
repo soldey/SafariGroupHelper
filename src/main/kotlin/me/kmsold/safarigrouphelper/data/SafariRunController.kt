@@ -21,8 +21,8 @@ object SafariRunController {
                     .append(text("Biome: ", ChatFormatting.GRAY))
                     .append(
                         text(
-                            ConfigManager.config.selectedBiome.displayName,
-                            ConfigManager.config.selectedBiome.formatting,
+                            ConfigManager.config.general.selectedBiome.displayName,
+                            ConfigManager.config.general.selectedBiome.formatting,
                         ),
                     ),
             )
@@ -62,7 +62,7 @@ object SafariRunController {
         val config = ConfigManager.config
         val biome = CritterBiome.biomeOf(critter)
 
-        if (isNew && config.announceNewUniques) {
+        if (isNew && config.general.announceNewUniques) {
             val biomeName = biome?.displayName ?: "?"
             val biomeColor = biome?.formatting ?: ChatFormatting.GRAY
             val progress = biome?.let { "${SafariSession.uniques(it)}/${it.total}" } ?: ""

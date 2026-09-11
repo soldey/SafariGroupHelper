@@ -24,7 +24,7 @@ object CritterChatParser {
     private var lastLineAt: Long = 0
 
     fun onChatMessage(message: Component) {
-        if (!ConfigManager.config.enabled) return
+        if (!ConfigManager.config.general.enabled) return
         val cleaned = CritterParsing.clean(message.string)
         if (cleaned.isEmpty()) return
 
@@ -36,7 +36,7 @@ object CritterChatParser {
 
         if (handleLocationLines(cleaned)) return
 
-        if (ConfigManager.config.parseOnlyInSafari && !LocationTracker.inSafari) return
+        if (ConfigManager.config.chat.parseOnlyInSafari && !LocationTracker.inSafari) return
         debugLog(cleaned)
 
         val parsed = CritterParsing.parseCatch(cleaned, ChatPatterns.catchPatterns, ChatPatterns.catchKeywords)
@@ -74,7 +74,7 @@ object CritterChatParser {
 
     /** Tells the user about lines that look like a catch but that no pattern understood. */
     private fun reportUnparsed(cleaned: String) {
-        if (!ConfigManager.config.debugChatParsing) return
+        if (!ConfigManager.config.chat.debugChatParsing) return
         val lower = cleaned.lowercase()
         val looksRelevant = ChatPatterns.catchKeywords.any { lower.contains(it) } ||
             CritterBiome.allCritters.any { cleaned.contains(it, ignoreCase = true) }
@@ -85,7 +85,7 @@ object CritterChatParser {
 
     /** With debug on, every line seen inside the safari is appended to chat-debug.log. */
     private fun debugLog(cleaned: String) {
-        if (!ConfigManager.config.debugChatParsing) return
+        if (!ConfigManager.config.chat.debugChatParsing) return
         runCatching { ConfigManager.configDir.resolve("chat-debug.log").appendText("$cleaned\n") }
     }
 }
