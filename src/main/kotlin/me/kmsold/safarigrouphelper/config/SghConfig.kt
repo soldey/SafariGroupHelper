@@ -123,6 +123,14 @@ class CritterSafariHudConfig {
     @ConfigOption(name = "Show run info", desc = "The block with the timer, catch counts and personal best.")
     @ConfigEditorBoolean
     var showRunInfo: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Progress bar",
+        desc = "The §a███§7 bar under the total counter. Turn it off to leave just the numbers.",
+    )
+    @ConfigEditorBoolean
+    var showProgressBar: Boolean = true
 }
 
 /** Subcategory of Critter Safari: what the tracker says in chat. */

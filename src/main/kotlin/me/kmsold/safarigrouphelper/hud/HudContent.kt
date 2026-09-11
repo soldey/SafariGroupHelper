@@ -112,12 +112,12 @@ object HudContent {
             percent >= 50 -> "§a"
             else -> "§e"
         }
-        return BlockContent(
-            listOf(
-                tr("hud.total", done, total, color, percent),
-                text("$color${"█".repeat(filled)}§8${"█".repeat(BAR_WIDTH - filled)}"),
-            ),
-        )
+        val lines = ArrayList<Component>()
+        lines += tr("hud.total", done, total, color, percent)
+        if (ConfigManager.config.critterSafari.hud.showProgressBar) {
+            lines += text("$color${"█".repeat(filled)}§8${"█".repeat(BAR_WIDTH - filled)}")
+        }
+        return BlockContent(lines)
     }
 
     private fun runInfo(showButton: Boolean): BlockContent {

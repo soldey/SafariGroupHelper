@@ -125,5 +125,7 @@
   "config.general.language.name": "Язык",
   "config.general.language.desc": "Язык текстов мода. Имена critters и локаций не переводятся — они так и встречаются в чате Hypixel.",
   "config.critterSafariHud.editPositions.name": "Позиции HUD",
-  "config.critterSafariHud.editPositions.desc": "Тот же редактор, что и в General: тащи блоки, колесо меняет размер, §eR§7 сбрасывает позиции."
+  "config.critterSafariHud.editPositions.desc": "Тот же редактор, что и в General: тащи блоки, колесо меняет размер, §eR§7 сбрасывает позиции.",
+  "config.critterSafariHud.showProgressBar.name": "Полоса прогресса",
+  "config.critterSafariHud.showProgressBar.desc": "Полоса §a███§7 под общим счётчиком. Выключи, чтобы остались только цифры."
 }
