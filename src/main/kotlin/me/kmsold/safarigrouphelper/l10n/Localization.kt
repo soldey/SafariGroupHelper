@@ -3,7 +3,6 @@ package me.kmsold.safarigrouphelper.l10n
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import me.kmsold.safarigrouphelper.SafariGroupHelper
-import net.minecraft.client.Minecraft
 
 /**
  * Translated strings, loaded from `assets/safarigrouphelper/lang/<code>.json`.
@@ -26,19 +25,10 @@ object Localization {
 
     fun reload(language: Language) {
         if (fallback.isEmpty()) fallback = read(Language.FALLBACK_CODE)
-        val code = resolve(language)
+        val code = language.code
         strings = if (code == Language.FALLBACK_CODE) fallback else read(code)
         loadedCode = if (strings.isEmpty()) Language.FALLBACK_CODE else code
         SafariGroupHelper.logger.info("Using language {} ({} strings)", loadedCode, strings.size)
-    }
-
-    /** [Language.AUTO] follows Minecraft, but only if we actually ship that language. */
-    private fun resolve(language: Language): String {
-        if (language != Language.AUTO) return language.code
-        val gameCode = runCatching {
-            Minecraft.getInstance().languageManager.selected.lowercase()
-        }.getOrNull() ?: return Language.FALLBACK_CODE
-        return Language.byCode(gameCode)?.code ?: Language.FALLBACK_CODE
     }
 
     private fun read(code: String): Map<String, String> = runCatching {

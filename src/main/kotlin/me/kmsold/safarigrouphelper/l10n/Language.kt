@@ -9,8 +9,6 @@ package me.kmsold.safarigrouphelper.l10n
  *  2. add an entry here with the same code and the language's own name.
  */
 enum class Language(val code: String, private val label: String) {
-    /** Follows whatever language Minecraft itself is set to, English if we have no file for it. */
-    AUTO("", "Auto"),
     ENGLISH("en_us", "English"),
     RUSSIAN("ru_ru", "Русский"),
     ;
@@ -21,5 +19,8 @@ enum class Language(val code: String, private val label: String) {
         const val FALLBACK_CODE = "en_us"
 
         fun byCode(code: String): Language? = entries.find { it.code.equals(code, ignoreCase = true) }
+
+        /** Used when reading the config, where the enum is stored by [name]. */
+        fun byName(name: String): Language? = entries.find { it.name == name }
     }
 }

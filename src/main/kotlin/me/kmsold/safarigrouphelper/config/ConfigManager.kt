@@ -3,6 +3,7 @@ package me.kmsold.safarigrouphelper.config
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import me.kmsold.safarigrouphelper.SafariGroupHelper
+import me.kmsold.safarigrouphelper.l10n.Language
 import net.fabricmc.loader.api.FabricLoader
 import java.nio.file.Files
 import java.nio.file.Path
@@ -87,6 +88,14 @@ object ConfigManager {
             val general = json.getAsJsonObject("general") ?: JsonObject().also { json.add("general", it) }
             general.add("language", language)
             json.remove("accessibility")
+        }
+        // "Auto" is gone. Gson turns an unknown enum constant into null without complaining, and
+        // a null would then blow up the first time a string is looked up.
+        json.getAsJsonObject("general")?.let { section ->
+            val language = section.get("language")
+            if (language != null && language.isJsonPrimitive && Language.byName(language.asString) == null) {
+                section.addProperty("language", Language.ENGLISH.name)
+            }
         }
         return json
     }

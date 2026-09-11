@@ -27,7 +27,7 @@ class LanguageFilesTest {
     private val english = load(Language.FALLBACK_CODE)
 
     private val translations: List<String>
-        get() = Language.entries.map { it.code }.filter { it.isNotEmpty() && it != Language.FALLBACK_CODE }
+        get() = Language.entries.map { it.code }.filter { it != Language.FALLBACK_CODE }
 
     @Test
     fun `english is the complete key set`() {
@@ -37,7 +37,6 @@ class LanguageFilesTest {
     @Test
     fun `every language in the enum ships a file`() {
         for (language in Language.entries) {
-            if (language == Language.AUTO) continue
             assertTrue(load(language.code).isNotEmpty(), "${language.code}.json is missing or empty")
         }
     }

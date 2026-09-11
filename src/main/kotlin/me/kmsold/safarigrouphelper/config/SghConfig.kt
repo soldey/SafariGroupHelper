@@ -62,11 +62,11 @@ class GeneralConfig {
     @Expose
     @ConfigOption(
         name = "Language",
-        desc = "Language of the mod's own text. §eAuto§7 follows Minecraft. Critter and location " +
-            "names are never translated, they appear in Hypixel chat as they are.",
+        desc = "Language of the mod's own text. Critter and location names are never translated, " +
+            "they appear in Hypixel chat as they are.",
     )
     @ConfigEditorDropdown
-    var language: Language = Language.AUTO
+    var language: Language = Language.ENGLISH
 }
 
 /** Subcategory of Critter Safari: what the tracker draws on screen. */
