@@ -122,14 +122,28 @@ tasks.jar {
     }
 }
 
+// Copied under a different name so the `exclude("/LICENSE")` below, which drops MoulConfig's
+// copy, does not also drop ours - Gradle matches excludes against the source name.
+val licenseForJar = tasks.register<Copy>("licenseForJar") {
+    // LGPL 3.0 is the GPL plus extra permissions, so both texts travel with the jar.
+    from("LICENSE") { rename { "LICENSE.txt" } }
+    from("COPYING") { rename { "COPYING.txt" } }
+    into(layout.buildDirectory.dir("license"))
+}
+
 // The shadowed jar is the real mod jar; the plain one has no bundled dependencies.
 tasks.shadowJar {
     archiveClassifier.set("")
     configurations = listOf(shadowImpl)
     exclude("META-INF/versions/**")
     exclude("META-INF/*.kotlin_module")
+    // MoulConfig puts its own licence at the root; ours belongs there instead, and its copy is
+    // kept under licenses/ so the jar states clearly what is bundled and under what terms.
+    exclude("/LICENSE")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "me.kmsold.safarigrouphelper.deps.moulconfig")
+    from(licenseForJar)
+    from("licenses") { into("licenses") }
 }
 
 tasks.jar {

@@ -3,6 +3,7 @@
     "id": "safarigrouphelper",
     "version": "${version}",
     "name": "Safari Group Helper",
+    "icon": "assets/safarigrouphelper/icon.png",
     "description": "Tracks unique critters caught by your group in the Hypixel SkyBlock Critter Safari. Something broken? Send the log to soldey on Discord.",
     "authors": [
         "kmsold"
@@ -12,7 +13,7 @@
         "sources": "https://github.com/soldey/SafariGroupHelper",
         "issues": "https://github.com/soldey/SafariGroupHelper/issues"
     },
-    "license": "MIT",
+    "license": "LGPL-3.0-or-later",
     "environment": "client",
     "entrypoints": {
         "client": [

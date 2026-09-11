@@ -43,6 +43,25 @@ sidebar plus the chat message you get when entering the safari.
 | `/sgh reset` | Reset the progress of the current run |
 | `/sgh debug` | Toggle chat parsing debug output |
 
+## Bundled software
+
+The settings screen is built on [MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig),
+which is bundled into the jar under a relocated package so it cannot clash with other mods'
+copies. MoulConfig is licensed under the MPL 2.0; its licence travels with the jar in
+`licenses/MoulConfig-MPL-2.0.txt`.
+
+## Licence
+
+Copyright (C) 2026 kmsold.
+
+Safari Group Helper is free software: you can redistribute it and/or modify it under the terms
+of the **GNU Lesser General Public License, version 3 or later**, as published by the Free
+Software Foundation. See `LICENSE` for the LGPL text and `COPYING` for the GPL text it builds
+on. In short: use it freely, but if you publish a modified version, publish its source too.
+
+It is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
 ## Something broken?
 
 Do not just describe it - **grab the log and send it to me straight away**, otherwise there is
