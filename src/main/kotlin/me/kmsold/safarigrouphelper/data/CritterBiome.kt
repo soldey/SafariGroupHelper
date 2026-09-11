@@ -1,5 +1,6 @@
 package me.kmsold.safarigrouphelper.data
 
+import me.kmsold.safarigrouphelper.l10n.Localization
 import net.minecraft.ChatFormatting
 
 /**
@@ -77,6 +78,17 @@ enum class CritterBiome(
     ;
 
     val key: String get() = name.lowercase()
+
+    /** Name shown to the player, from the language files. */
+    val translatedName: String get() = Localization.trOr("biome.$key", displayName)
+
+    /** The `§x` colour code of [formatting], for building translated lines. */
+    val colorCode: String get() = formatting.toString()
+
+    /** Colour code plus translated name, the usual way a biome is dropped into a message. */
+    val coloredName: String get() = "$colorCode$translatedName"
+
+    override fun toString(): String = translatedName
 
     val total: Int get() = critters.size
 

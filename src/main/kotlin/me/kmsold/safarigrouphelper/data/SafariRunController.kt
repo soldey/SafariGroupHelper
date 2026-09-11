@@ -3,8 +3,6 @@ package me.kmsold.safarigrouphelper.data
 import me.kmsold.safarigrouphelper.config.ConfigManager
 import me.kmsold.safarigrouphelper.util.ChatOut
 import me.kmsold.safarigrouphelper.util.TimeFormat
-import me.kmsold.safarigrouphelper.util.text
-import net.minecraft.ChatFormatting
 
 /**
  * Owns the lifecycle of a run: start/stop the timer, record catches, announce uniques and
@@ -16,21 +14,10 @@ object SafariRunController {
         val fresh = SafariSession.startOrResume()
         if (fresh) {
             SafariStats.runStarted()
-            ChatOut.send(
-                text("Run started. ", ChatFormatting.GREEN)
-                    .append(text("Biome: ", ChatFormatting.GRAY))
-                    .append(
-                        text(
-                            ConfigManager.config.general.selectedBiome.displayName,
-                            ConfigManager.config.general.selectedBiome.formatting,
-                        ),
-                    ),
-            )
+            val biome = ConfigManager.config.general.selectedBiome
+            ChatOut.send("chat.runStarted", "${biome.colorCode}${biome.translatedName}")
         } else {
-            ChatOut.send(
-                text("Resumed run at ", ChatFormatting.GRAY)
-                    .append(text(TimeFormat.clock(SafariSession.elapsedMs), ChatFormatting.YELLOW)),
-            )
+            ChatOut.send("chat.runResumed", TimeFormat.clock(SafariSession.elapsedMs))
         }
     }
 
@@ -40,16 +27,11 @@ object SafariRunController {
         SafariSession.stop()
         SafariSession.save()
         ChatOut.send(
-            text("Run ended after ", ChatFormatting.GRAY)
-                .append(text(TimeFormat.clock(elapsed), ChatFormatting.YELLOW))
-                .append(text(" - ", ChatFormatting.DARK_GRAY))
-                .append(
-                    text(
-                        "${SafariSession.uniqueTotal}/${CritterBiome.totalCritterCount} unique",
-                        ChatFormatting.AQUA,
-                    ),
-                )
-                .append(text(", ${SafariSession.duplicates} repeats", ChatFormatting.GRAY)),
+            "chat.runEnded",
+            TimeFormat.clock(elapsed),
+            SafariSession.uniqueTotal,
+            CritterBiome.totalCritterCount,
+            SafariSession.duplicates,
         )
     }
 
@@ -59,26 +41,17 @@ object SafariRunController {
         if (!SafariSession.isActive) SafariSession.startOrResume()
 
         val isNew = SafariSession.record(critter, player)
-        val config = ConfigManager.config
         val biome = CritterBiome.biomeOf(critter)
 
-        if (isNew && config.general.announceNewUniques) {
-            val biomeName = biome?.displayName ?: "?"
-            val biomeColor = biome?.formatting ?: ChatFormatting.GRAY
-            val progress = biome?.let { "${SafariSession.uniques(it)}/${it.total}" } ?: ""
+        if (isNew && ConfigManager.config.general.announceNewUniques) {
             ChatOut.send(
-                text("New: ", ChatFormatting.GREEN)
-                    .append(text(critter, ChatFormatting.WHITE))
-                    .append(text(" [", ChatFormatting.DARK_GRAY))
-                    .append(text(biomeName, biomeColor))
-                    .append(text(" $progress", ChatFormatting.GRAY))
-                    .append(text("] ", ChatFormatting.DARK_GRAY))
-                    .append(
-                        text(
-                            "${SafariSession.uniqueTotal}/${CritterBiome.totalCritterCount} total",
-                            ChatFormatting.AQUA,
-                        ),
-                    ),
+                "chat.newUnique",
+                critter,
+                biome?.let { "${it.colorCode}${it.translatedName}" } ?: "§7?",
+                biome?.let { SafariSession.uniques(it) } ?: 0,
+                biome?.total ?: 0,
+                SafariSession.uniqueTotal,
+                CritterBiome.totalCritterCount,
             )
         }
 
@@ -90,27 +63,20 @@ object SafariRunController {
         val duration = SafariSession.completionMs ?: SafariSession.elapsedMs
         val previousBest = SafariStats.recordCompletion(duration)
 
-        ChatOut.send(
-            text("100% - all ", ChatFormatting.GOLD)
-                .append(text("${CritterBiome.totalCritterCount}", ChatFormatting.YELLOW))
-                .append(text(" critters in ", ChatFormatting.GOLD))
-                .append(text(TimeFormat.clock(duration), ChatFormatting.YELLOW)),
-        )
+        ChatOut.send("chat.complete", CritterBiome.totalCritterCount, TimeFormat.clock(duration))
         when {
-            previousBest == null -> ChatOut.send(
-                text("First completion - new personal best!", ChatFormatting.LIGHT_PURPLE),
-            )
+            previousBest == null -> ChatOut.send("chat.firstCompletion")
 
             duration < previousBest -> ChatOut.send(
-                text("NEW PERSONAL BEST! ", ChatFormatting.LIGHT_PURPLE)
-                    .append(text("(old: ${TimeFormat.clock(previousBest)}, ", ChatFormatting.GRAY))
-                    .append(text("-${TimeFormat.clock(previousBest - duration)})", ChatFormatting.GREEN)),
+                "chat.newPersonalBest",
+                TimeFormat.clock(previousBest),
+                TimeFormat.clock(previousBest - duration),
             )
 
             else -> ChatOut.send(
-                text("Personal best stays at ", ChatFormatting.GRAY)
-                    .append(text(TimeFormat.clock(previousBest), ChatFormatting.YELLOW))
-                    .append(text(" (+${TimeFormat.clock(duration - previousBest)})", ChatFormatting.RED)),
+                "chat.personalBestKept",
+                TimeFormat.clock(previousBest),
+                TimeFormat.clock(duration - previousBest),
             )
         }
     }

@@ -13,6 +13,7 @@ import me.kmsold.safarigrouphelper.hud.BiomeSelectScreen
 import me.kmsold.safarigrouphelper.hud.HudEditorScreen
 import me.kmsold.safarigrouphelper.hud.HudInteractions
 import me.kmsold.safarigrouphelper.hud.HudRenderer
+import me.kmsold.safarigrouphelper.l10n.Localization
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
@@ -41,6 +42,7 @@ object SafariGroupHelper : ClientModInitializer {
 
     override fun onInitializeClient() {
         ConfigManager.load()
+        Localization.reload(ConfigManager.config.accessibility.language)
         SafariStats.load()
         SafariSession.load()
         ChatPatterns.load()

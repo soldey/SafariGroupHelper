@@ -8,7 +8,7 @@ import me.kmsold.safarigrouphelper.data.SafariSession
 import me.kmsold.safarigrouphelper.data.SafariStats
 import me.kmsold.safarigrouphelper.util.TimeFormat
 import me.kmsold.safarigrouphelper.util.text
-import net.minecraft.ChatFormatting
+import me.kmsold.safarigrouphelper.util.tr
 import net.minecraft.network.chat.Component
 
 /** Things a HUD line can do when clicked. */
@@ -56,37 +56,28 @@ object HudContent {
         if (!showProgress && !selectAllowed) return BlockContent(emptyList())
         val biome = ConfigManager.config.general.selectedBiome
         val lines = ArrayList<Component>()
-        lines += header(biome, showProgress)
+        lines += if (showProgress) {
+            tr("hud.biomeHeader", biome.colorCode, biome.translatedName, SafariSession.uniques(biome), biome.total)
+        } else {
+            tr("hud.biomeHeaderPlain", biome.colorCode, biome.translatedName)
+        }
         if (showProgress) {
             for (critter in biome.critters) lines += critterLine(critter)
         }
         val buttons = ArrayList<HudButton>()
         if (showButton) {
             buttons += HudButton(lines.size, HudAction.SWITCH_BIOME)
-            lines += text("[Switch biome]", ChatFormatting.YELLOW)
+            lines += tr("hud.switchBiome")
         }
         return BlockContent(lines, buttons)
     }
 
-    /** Outside the safari only the biome name is shown - progress is a safari-only thing. */
-    private fun header(biome: CritterBiome, showProgress: Boolean): Component {
-        val line = text("").append(text(biome.displayName, biome.formatting, ChatFormatting.BOLD))
-        if (showProgress) {
-            line.append(text(" "))
-                .append(text("${SafariSession.uniques(biome)}/${biome.total}", ChatFormatting.AQUA))
-        }
-        return line
-    }
-
     private fun critterLine(critter: String): Component {
         val count = SafariSession.countOf(critter)
-        val line = text("")
-        return if (count > 0) {
-            line.append(text(" ✔ ", ChatFormatting.GREEN)).append(text(critter, ChatFormatting.WHITE))
-            if (count > 1) line.append(text(" x$count", ChatFormatting.DARK_GRAY))
-            line
-        } else {
-            line.append(text(" ✖ ", ChatFormatting.DARK_RED)).append(text(critter, ChatFormatting.GRAY))
+        return when {
+            count > 1 -> tr("hud.critterCaughtRepeat", critter, count)
+            count == 1 -> tr("hud.critterCaught", critter)
+            else -> tr("hud.critterMissing", critter)
         }
     }
 
@@ -95,11 +86,15 @@ object HudContent {
         if (config.hud.otherBiomesMode == OtherBiomesMode.OFF) return BlockContent(emptyList())
         val others = CritterBiome.entries.filter { it != config.general.selectedBiome }
         val lines = ArrayList<Component>()
-        lines += text("Other biomes", ChatFormatting.GRAY, ChatFormatting.BOLD)
+        lines += tr("hud.otherBiomes")
         for (biome in others) {
-            lines += text("")
-                .append(text(biome.displayName, biome.formatting))
-                .append(text(" ${SafariSession.uniques(biome)}/${biome.total}", ChatFormatting.AQUA))
+            lines += tr(
+                "hud.biomeProgress",
+                biome.colorCode,
+                biome.translatedName,
+                SafariSession.uniques(biome),
+                biome.total,
+            )
             if (config.hud.otherBiomesMode == OtherBiomesMode.FULL) {
                 for (critter in biome.critters) lines += critterLine(critter)
             }
@@ -113,45 +108,28 @@ object HudContent {
         val percent = if (total == 0) 0 else done * 100 / total
         val filled = if (total == 0) 0 else done * BAR_WIDTH / total
         val color = when {
-            percent >= 100 -> ChatFormatting.GOLD
-            percent >= 50 -> ChatFormatting.GREEN
-            else -> ChatFormatting.YELLOW
+            percent >= 100 -> "§6"
+            percent >= 50 -> "§a"
+            else -> "§e"
         }
         return BlockContent(
             listOf(
-                text("")
-                    .append(text("Total ", ChatFormatting.GRAY, ChatFormatting.BOLD))
-                    .append(text("$done/$total", ChatFormatting.AQUA))
-                    .append(text(" ($percent%)", color)),
-                text("")
-                    .append(text("█".repeat(filled), color))
-                    .append(text("█".repeat(BAR_WIDTH - filled), ChatFormatting.DARK_GRAY)),
+                tr("hud.total", done, total, color, percent),
+                text("$color${"█".repeat(filled)}§8${"█".repeat(BAR_WIDTH - filled)}"),
             ),
         )
     }
 
     private fun runInfo(showButton: Boolean): BlockContent {
         val lines = ArrayList<Component>()
-        lines += text("")
-            .append(text("Time ", ChatFormatting.GRAY))
-            .append(text(TimeFormat.clock(SafariSession.elapsedMs), ChatFormatting.YELLOW))
-        lines += text("")
-            .append(text("Catches ", ChatFormatting.GRAY))
-            .append(text("${SafariSession.state.totalCatches}", ChatFormatting.WHITE))
-            .append(text(" (${SafariSession.duplicates} repeats)", ChatFormatting.DARK_GRAY))
-        SafariStats.personalBestMs?.let {
-            lines += text("")
-                .append(text("PB ", ChatFormatting.GRAY))
-                .append(text(TimeFormat.clock(it), ChatFormatting.LIGHT_PURPLE))
-        }
+        lines += tr("hud.time", TimeFormat.clock(SafariSession.elapsedMs))
+        lines += tr("hud.catches", SafariSession.state.totalCatches, SafariSession.duplicates)
+        SafariStats.personalBestMs?.let { lines += tr("hud.pb", TimeFormat.clock(it)) }
+
         val buttons = ArrayList<HudButton>()
         if (showButton) {
             buttons += HudButton(lines.size, HudAction.RESET_RUN)
-            lines += if (HudInteractions.resetPending) {
-                text("[Click again to reset]", ChatFormatting.RED)
-            } else {
-                text("[Reset run]", ChatFormatting.YELLOW)
-            }
+            lines += if (HudInteractions.resetPending) tr("hud.resetConfirm") else tr("hud.resetRun")
         }
         return BlockContent(lines, buttons)
     }

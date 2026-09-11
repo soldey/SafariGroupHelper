@@ -2,6 +2,7 @@ package me.kmsold.safarigrouphelper.hud
 
 import me.kmsold.safarigrouphelper.config.ConfigManager
 import me.kmsold.safarigrouphelper.util.text
+import me.kmsold.safarigrouphelper.util.tr
 import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
@@ -11,7 +12,7 @@ import net.minecraft.client.input.MouseButtonEvent
  * Drag the HUD blocks around. Scroll over a block to scale it, right click to toggle it off,
  * R resets everything to the defaults.
  */
-class HudEditorScreen(private val parent: Screen? = null) : Screen(text("Safari Group Helper - HUD editor")) {
+class HudEditorScreen(private val parent: Screen? = null) : Screen(tr("screen.hudEditor.title")) {
 
     private var dragging: HudBlock? = null
     private var dragOffsetX = 0f
@@ -38,15 +39,15 @@ class HudEditorScreen(private val parent: Screen? = null) : Screen(text("Safari 
         }
 
         val hints = listOf(
-            "Drag a block to move it",
-            "Scroll over a block to resize it",
-            "Right click a block to hide/show it",
-            "R - reset all positions, Esc - done",
+            "screen.hudEditor.hintDrag",
+            "screen.hudEditor.hintScroll",
+            "screen.hudEditor.hintRightClick",
+            "screen.hudEditor.hintKeys",
         )
         hints.forEachIndexed { index, hint ->
             graphics.text(
                 font,
-                text(hint, ChatFormatting.GRAY),
+                tr(hint),
                 6,
                 height - 6 - (hints.size - index) * (font.lineHeight + 1),
                 0xFFFFFFFF.toInt(),

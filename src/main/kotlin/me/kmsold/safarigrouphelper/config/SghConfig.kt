@@ -10,6 +10,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import me.kmsold.safarigrouphelper.SafariGroupHelper
 import me.kmsold.safarigrouphelper.data.CritterBiome
+import me.kmsold.safarigrouphelper.l10n.Language
+import me.kmsold.safarigrouphelper.l10n.Localization
 import me.kmsold.safarigrouphelper.hud.HudEditorScreen
 import net.minecraft.client.Minecraft
 
@@ -22,7 +24,8 @@ enum class OtherBiomesMode(val label: String) {
 
     fun next(): OtherBiomesMode = entries[(ordinal + 1) % entries.size]
 
-    override fun toString(): String = label
+    /** Shown in the dropdown, so it goes through the language files. */
+    override fun toString(): String = Localization.trOr("enum.otherBiomes.$name", label)
 }
 
 /** Where the biome name and the switch button may appear. */
@@ -34,7 +37,7 @@ enum class BiomeSelectVisibility(val label: String) {
 
     fun next(): BiomeSelectVisibility = entries[(ordinal + 1) % entries.size]
 
-    override fun toString(): String = label
+    override fun toString(): String = Localization.trOr("enum.biomeSelect.$name", label)
 }
 
 class HudPos(
@@ -113,6 +116,18 @@ class HudConfig {
     var hudBackground: Boolean = true
 }
 
+class AccessibilityConfig {
+
+    @Expose
+    @ConfigOption(
+        name = "Language",
+        desc = "Language of the mod's own text. §eAuto§7 follows Minecraft. Critter names are " +
+            "never translated, they appear in Hypixel chat as they are.",
+    )
+    @ConfigEditorDropdown
+    var language: Language = Language.AUTO
+}
+
 class DevConfig {
 
     @Expose
@@ -150,6 +165,10 @@ class SghConfig : Config() {
     var hud: HudConfig = HudConfig()
 
     @Expose
+    @Category(name = "Accessibility", desc = "Language and ease of use")
+    var accessibility: AccessibilityConfig = AccessibilityConfig()
+
+    @Expose
     @Category(name = "Dev", desc = "Chat parsing internals and debugging")
     var dev: DevConfig = DevConfig()
 
@@ -164,5 +183,9 @@ class SghConfig : Config() {
 
     override fun saveNow() {
         ConfigManager.save()
+        // Picking another language only needs the strings swapped; the settings screen itself is
+        // rebuilt the next time it is opened.
+        Localization.reload(accessibility.language)
+        SghConfigGui.invalidate()
     }
 }

@@ -2,8 +2,8 @@ package me.kmsold.safarigrouphelper
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import me.kmsold.safarigrouphelper.config.ConfigManager
-import me.kmsold.safarigrouphelper.config.SghConfigGui
 import me.kmsold.safarigrouphelper.config.OtherBiomesMode
+import me.kmsold.safarigrouphelper.config.SghConfigGui
 import me.kmsold.safarigrouphelper.data.CritterBiome
 import me.kmsold.safarigrouphelper.data.LocationTracker
 import me.kmsold.safarigrouphelper.data.SafariSession
@@ -11,12 +11,11 @@ import me.kmsold.safarigrouphelper.data.SafariStats
 import me.kmsold.safarigrouphelper.hud.BiomeSelectScreen
 import me.kmsold.safarigrouphelper.hud.HudEditorScreen
 import me.kmsold.safarigrouphelper.hud.HudInteractions
+import me.kmsold.safarigrouphelper.l10n.Localization
 import me.kmsold.safarigrouphelper.util.ChatOut
 import me.kmsold.safarigrouphelper.util.TimeFormat
-import me.kmsold.safarigrouphelper.util.text
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
-import net.minecraft.ChatFormatting
 
 /** `/sgh` and its subcommands. Everything is client side. */
 object SghCommands {
@@ -79,41 +78,24 @@ object SghCommands {
     private fun setBiome(raw: String): Int {
         val biome = CritterBiome.byKey(raw)
         if (biome == null) {
-            ChatOut.send(
-                text("Unknown biome '$raw'. Use: ", ChatFormatting.RED)
-                    .append(text(CritterBiome.entries.joinToString(", ") { it.key }, ChatFormatting.GRAY)),
-            )
+            ChatOut.send("command.unknownBiome", raw, CritterBiome.entries.joinToString(", ") { it.key })
             return 0
         }
         ConfigManager.config.general.selectedBiome = biome
         ConfigManager.save()
-        ChatOut.send(
-            text("Biome set to ", ChatFormatting.GRAY)
-                .append(text(biome.displayName, biome.formatting)),
-        )
+        ChatOut.send("command.biomeSet", biome.coloredName)
         return 1
     }
 
     private fun setOthersMode(raw: String): Int {
         val mode = OtherBiomesMode.entries.find { it.name.equals(raw, ignoreCase = true) }
         if (mode == null) {
-            ChatOut.send(
-                text("Unknown mode '$raw'. Use: ", ChatFormatting.RED)
-                    .append(
-                        text(
-                            OtherBiomesMode.entries.joinToString(", ") { it.name.lowercase() },
-                            ChatFormatting.GRAY,
-                        ),
-                    ),
-            )
+            ChatOut.send("command.unknownMode", raw, OtherBiomesMode.entries.joinToString(", ") { it.name.lowercase() })
             return 0
         }
         ConfigManager.config.hud.otherBiomesMode = mode
         ConfigManager.save()
-        ChatOut.send(
-            text("Other biomes display: ", ChatFormatting.GRAY)
-                .append(text(mode.label, ChatFormatting.YELLOW)),
-        )
+        ChatOut.send("command.othersMode", mode.toString())
         return 1
     }
 
@@ -123,92 +105,54 @@ object SghCommands {
     }
 
     private fun toggleDebug(): Int {
-        val config = ConfigManager.config
-        config.dev.debugChatParsing = !config.dev.debugChatParsing
+        val dev = ConfigManager.config.dev
+        dev.debugChatParsing = !dev.debugChatParsing
         ConfigManager.save()
-        ChatOut.send(
-            text("Chat debug: ", ChatFormatting.GRAY)
-                .append(
-                    if (config.dev.debugChatParsing) text("ON", ChatFormatting.GREEN)
-                    else text("OFF", ChatFormatting.RED),
-                )
-                .append(text(" (log: chat-debug.log)", ChatFormatting.DARK_GRAY)),
-        )
+        ChatOut.send("command.debug", Localization.tr(if (dev.debugChatParsing) "command.on" else "command.off"))
         return 1
     }
 
     /** Prints everything the location detection is working with - for reporting problems. */
     private fun dumpLocation(): Int {
-        ChatOut.send(
-            text("mod api: ", ChatFormatting.GRAY)
-                .append(
-                    if (LocationTracker.apiAvailable) {
-                        text("mode=${LocationTracker.apiMode} map=${LocationTracker.apiMap}", ChatFormatting.GREEN)
-                    } else {
-                        text("no location packet received yet", ChatFormatting.RED)
-                    },
-                ),
-        )
-        ChatOut.send(
-            text("inSafari=${LocationTracker.inSafari} inCanyon=${LocationTracker.inCanyon}", ChatFormatting.YELLOW),
-        )
-        ChatOut.send(text("area line: ${LocationTracker.areaLine ?: "none"}", ChatFormatting.GRAY))
+        val api = if (LocationTracker.apiAvailable) {
+            Localization.tr("command.dump.apiValue", LocationTracker.apiMode, LocationTracker.apiMap)
+        } else {
+            Localization.tr("command.dump.apiMissing")
+        }
+        ChatOut.send("command.dump.api", api)
+        ChatOut.send("command.dump.flags", LocationTracker.inSafari, LocationTracker.inCanyon)
+        ChatOut.send("command.dump.language", Localization.loadedCode)
+        ChatOut.send("command.dump.areaLine", LocationTracker.areaLine ?: Localization.tr("command.unknown"))
         val sidebar = LocationTracker.sidebarLines
         if (sidebar.isEmpty()) {
-            ChatOut.send("sidebar: empty", ChatFormatting.RED)
+            ChatOut.send("command.dump.sidebarEmpty")
         } else {
-            ChatOut.send("sidebar (${sidebar.size} lines):", ChatFormatting.GRAY)
-            sidebar.forEach { ChatOut.send(text("  '$it'", ChatFormatting.DARK_GRAY)) }
+            ChatOut.send("command.dump.sidebar", sidebar.size)
+            sidebar.forEach { ChatOut.send("command.dump.sidebarLine", it) }
         }
         return 1
     }
 
     private fun printStatus(): Int {
         val biome = ConfigManager.config.general.selectedBiome
-        ChatOut.send(
-            text("Area: ", ChatFormatting.GRAY)
-                .append(
-                    text(
-                        when {
-                            LocationTracker.inSafari -> LocationTracker.CRITTER_SAFARI
-                            LocationTracker.inCanyon -> LocationTracker.TORRHUS_CANYON
-                            else -> LocationTracker.areaLine ?: LocationTracker.apiMap ?: "unknown"
-                        },
-                        ChatFormatting.YELLOW,
-                    ),
-                ),
-        )
-        ChatOut.send(
-            text("Biome ", ChatFormatting.GRAY)
-                .append(text(biome.displayName, biome.formatting))
-                .append(text(" ${SafariSession.uniques(biome)}/${biome.total}", ChatFormatting.AQUA)),
-        )
+        val area = when {
+            LocationTracker.inSafari -> LocationTracker.CRITTER_SAFARI
+            LocationTracker.inCanyon -> LocationTracker.TORRHUS_CANYON
+            else -> LocationTracker.areaLine ?: LocationTracker.apiMap ?: Localization.tr("command.unknown")
+        }
+        ChatOut.send("command.status.area", area)
+        ChatOut.send("command.status.biome", biome.coloredName, SafariSession.uniques(biome), biome.total)
         for (other in CritterBiome.entries.filter { it != biome }) {
-            ChatOut.send(
-                text("  ", ChatFormatting.GRAY)
-                    .append(text(other.displayName, other.formatting))
-                    .append(text(" ${SafariSession.uniques(other)}/${other.total}", ChatFormatting.AQUA)),
-            )
+            ChatOut.send("command.status.otherBiome", other.coloredName, SafariSession.uniques(other), other.total)
         }
         ChatOut.send(
-            text("Total ", ChatFormatting.GRAY)
-                .append(
-                    text(
-                        "${SafariSession.uniqueTotal}/${CritterBiome.totalCritterCount}",
-                        ChatFormatting.AQUA,
-                    ),
-                )
-                .append(text(" | time ", ChatFormatting.GRAY))
-                .append(text(TimeFormat.clock(SafariSession.elapsedMs), ChatFormatting.YELLOW))
-                .append(text(" | repeats ", ChatFormatting.GRAY))
-                .append(text("${SafariSession.duplicates}", ChatFormatting.WHITE)),
+            "command.status.total",
+            SafariSession.uniqueTotal,
+            CritterBiome.totalCritterCount,
+            TimeFormat.clock(SafariSession.elapsedMs),
+            SafariSession.duplicates,
         )
-        SafariStats.personalBestMs?.let {
-            ChatOut.send(
-                text("Personal best: ", ChatFormatting.GRAY)
-                    .append(text(TimeFormat.clock(it), ChatFormatting.LIGHT_PURPLE)),
-            )
-        }
+        SafariStats.personalBestMs?.let { ChatOut.send("command.status.pb", TimeFormat.clock(it)) }
         return 1
     }
 }

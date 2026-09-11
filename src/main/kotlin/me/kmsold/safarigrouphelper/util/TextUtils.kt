@@ -1,5 +1,6 @@
 package me.kmsold.safarigrouphelper.util
 
+import me.kmsold.safarigrouphelper.l10n.Localization
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
@@ -10,17 +11,18 @@ fun text(value: String): MutableComponent = Component.literal(value)
 fun text(value: String, vararg formatting: ChatFormatting): MutableComponent =
     Component.literal(value).withStyle(*formatting)
 
+/** A translated line. Values in the language files carry their own `§` colour codes. */
+fun tr(key: String, vararg args: Any?): MutableComponent = Component.literal(Localization.tr(key, *args))
+
 /** Client-side only chat output; never reaches the server or other players. */
 object ChatOut {
 
-    private val prefix: Component = text("[SGH] ", ChatFormatting.DARK_AQUA)
-
     fun send(message: Component) {
         val chat = Minecraft.getInstance().gui.chat
-        chat.addClientSystemMessage(text("").append(prefix).append(message))
+        chat.addClientSystemMessage(text(Localization.tr("chat.prefix")).append(message))
     }
 
-    fun send(message: String, vararg formatting: ChatFormatting) = send(text(message, *formatting))
+    fun send(key: String, vararg args: Any?) = send(tr(key, *args))
 }
 
 object TimeFormat {

@@ -27,7 +27,7 @@ object SghConfigGui {
     private fun editorInstance(): MoulConfigEditor<SghConfig> = editor ?: build().also { editor = it }
 
     private fun build(): MoulConfigEditor<SghConfig> {
-        val processor = MoulConfigProcessor(ConfigManager.config)
+        val processor = LocalizedConfigProcessor(ConfigManager.config)
         BuiltinMoulConfigGuis.addProcessors(processor)
         val driver = ConfigProcessorDriver(processor)
         driver.warnForPrivateFields = false

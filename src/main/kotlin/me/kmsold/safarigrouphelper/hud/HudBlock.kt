@@ -2,11 +2,12 @@ package me.kmsold.safarigrouphelper.hud
 
 import me.kmsold.safarigrouphelper.config.ConfigManager
 import me.kmsold.safarigrouphelper.config.HudPos
+import me.kmsold.safarigrouphelper.l10n.Localization
 
 /** The movable HUD blocks. Each one has its own position, scale and on/off switch. */
 enum class HudBlock(
     val id: String,
-    val label: String,
+    private val fallbackLabel: String,
     private val defaultX: Int,
     private val defaultY: Int,
 ) {
@@ -15,6 +16,9 @@ enum class HudBlock(
     TOTAL_PROGRESS("total_progress", "Total progress", 4, 205),
     RUN_INFO("run_info", "Run info / timer", 4, 235),
     ;
+
+    /** Name shown above the block in the HUD editor. */
+    val label: String get() = Localization.trOr("hud.block.$id", fallbackLabel)
 
     val pos: HudPos get() = ConfigManager.config.position(id, defaultX, defaultY)
 }
