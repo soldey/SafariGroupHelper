@@ -40,7 +40,9 @@ object HudContent {
         val config = ConfigManager.config
         val showProgress = editorPreview || LocationTracker.inSafari
         val selectAllowed = editorPreview || LocationTracker.biomeSelectAllowed(config.hud.biomeSelectVisibility)
-        val buttonsVisible = inInventory || !config.hud.switchButtonOnlyInInventory
+        // Clickable lines only exist while a container screen is open, so they cannot be hit by
+        // accident while hunting.
+        val buttonsVisible = inInventory
 
         return when (block) {
             HudBlock.MY_BIOME -> myBiome(showProgress, selectAllowed, selectAllowed && buttonsVisible)

@@ -45,37 +45,56 @@ object ConfigManager {
             .onFailure { SafariGroupHelper.logger.error("Could not read config.json, using defaults", it) }
             .getOrNull() ?: return null
 
-        // 1.0.0 kept every option at the top level; move those onto the categorised layout.
-        val migrated = if (raw.has("selectedBiome") && !raw.has("general")) migrateFlatConfig(raw) else raw
+        val migrated = migrate(raw)
         return runCatching { gson.fromJson(migrated, SghConfig::class.java) }
             .onFailure { SafariGroupHelper.logger.error("Could not parse config.json, using defaults", it) }
             .getOrNull()
     }
 
+    /** Brings older config layouts onto the current one. Unknown keys are dropped on the next save. */
+    private fun migrate(raw: JsonObject): JsonObject {
+        var json = raw
+        if (json.has("selectedBiome") && !json.has("general")) json = migrateFlatConfig(json)
+        // 1.1.x called the debugging category "chat".
+        if (json.has("chat") && !json.has("dev")) {
+            SafariGroupHelper.logger.info("Renaming the 'chat' config category to 'dev'")
+            json.add("dev", json.remove("chat"))
+        }
+        // The master switch used to live in "general" before it got its own category.
+        val general = json.getAsJsonObject("general")
+        if (general != null && general.has("enabled") && !json.has("critterSafari")) {
+            val critterSafari = JsonObject()
+            critterSafari.add("enabled", general.remove("enabled"))
+            json.add("critterSafari", critterSafari)
+        }
+        return json
+    }
+
     private fun migrateFlatConfig(old: JsonObject): JsonObject {
         SafariGroupHelper.logger.info("Migrating the 1.0.0 config layout")
         val new = JsonObject()
+        val critterSafari = JsonObject()
         val general = JsonObject()
         val hud = JsonObject()
-        val chat = JsonObject()
+        val dev = JsonObject()
 
-        fun move(key: String, target: JsonObject, newKey: String = key) {
-            old.get(key)?.let { target.add(newKey, it) }
+        fun move(key: String, target: JsonObject) {
+            old.get(key)?.let { target.add(key, it) }
         }
 
-        move("enabled", general)
+        move("enabled", critterSafari)
         move("selectedBiome", general)
         move("announceNewUniques", general)
         move("otherBiomesMode", hud)
         move("biomeSelectVisibility", hud)
-        move("switchButtonOnlyInInventory", hud)
         move("hudBackground", hud)
-        move("parseOnlyInSafari", chat)
-        move("debugChatParsing", chat)
+        move("parseOnlyInSafari", dev)
+        move("debugChatParsing", dev)
 
+        new.add("critterSafari", critterSafari)
         new.add("general", general)
         new.add("hud", hud)
-        new.add("chat", chat)
+        new.add("dev", dev)
         old.get("positions")?.let { new.add("positions", it) }
         return new
     }

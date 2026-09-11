@@ -27,7 +27,7 @@ object HudRenderer {
     fun render(graphics: GuiGraphicsExtractor, inInventory: Boolean, editorPreview: Boolean = false) {
         lastBounds.clear()
         buttonBounds.clear()
-        if (!ConfigManager.config.general.enabled) return
+        if (!ConfigManager.config.critterSafari.enabled) return
 
         for (block in HudBlock.entries) {
             val content = HudContent.build(block, inInventory, editorPreview)

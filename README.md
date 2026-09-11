@@ -14,8 +14,9 @@ sidebar plus the chat message you get when entering the safari.
 
 * **Pick your biome** - Cavern / Forest / Haunted / Icy. Change it by clicking the
   `[Switch biome]` label in the HUD or with `/sgh biome <cavern|forest|haunted|icy>`.
-  By default the button only shows up **while an inventory or chest is open**; where it is
-  available at all (Safari only / Safari + Torrhus Canyon / everywhere) is configurable.
+  The button only shows up **while an inventory or chest is open**, so it cannot be hit by
+  accident; where it is available at all (Safari only / Safari + Torrhus Canyon / everywhere)
+  is configurable.
 * **Critter list for your biome** with ✔/✖ marks and a repeat counter (`x3`).
 * **Progress of the other biomes** in a single block: off / just `3/9` / full critter list.
 * **Overall progress** from 0 to 100% with a bar (37 critters in total).

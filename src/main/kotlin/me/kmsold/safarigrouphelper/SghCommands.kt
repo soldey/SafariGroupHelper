@@ -124,12 +124,12 @@ object SghCommands {
 
     private fun toggleDebug(): Int {
         val config = ConfigManager.config
-        config.chat.debugChatParsing = !config.chat.debugChatParsing
+        config.dev.debugChatParsing = !config.dev.debugChatParsing
         ConfigManager.save()
         ChatOut.send(
             text("Chat debug: ", ChatFormatting.GRAY)
                 .append(
-                    if (config.chat.debugChatParsing) text("ON", ChatFormatting.GREEN)
+                    if (config.dev.debugChatParsing) text("ON", ChatFormatting.GREEN)
                     else text("OFF", ChatFormatting.RED),
                 )
                 .append(text(" (log: chat-debug.log)", ChatFormatting.DARK_GRAY)),

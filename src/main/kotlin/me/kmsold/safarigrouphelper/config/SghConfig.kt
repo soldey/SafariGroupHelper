@@ -44,12 +44,19 @@ class HudPos(
     @Expose var enabled: Boolean = true,
 )
 
-class GeneralConfig {
+class CritterSafariConfig {
 
     @Expose
-    @ConfigOption(name = "Mod enabled", desc = "Master switch. Turns off the HUD and all chat parsing.")
+    @ConfigOption(
+        name = "Enabled",
+        desc = "Turns the Critter Safari module on or off. With it off there is no HUD and no " +
+            "chat parsing at all.",
+    )
     @ConfigEditorBoolean
     var enabled: Boolean = true
+}
+
+class GeneralConfig {
 
     @Expose
     @ConfigOption(
@@ -72,6 +79,16 @@ class GeneralConfig {
 
 class HudConfig {
 
+    @ConfigOption(
+        name = "HUD positions",
+        desc = "Drag blocks with the mouse, scroll over one to resize it, right click to hide it, " +
+            "press §eR§7 to reset every position.",
+    )
+    @ConfigEditorButton(buttonText = "Edit")
+    val editPositions: Runnable = Runnable {
+        SafariGroupHelper.openScreen(HudEditorScreen(Minecraft.getInstance().screen))
+    }
+
     @Expose
     @ConfigOption(
         name = "Other biomes",
@@ -91,31 +108,12 @@ class HudConfig {
     var biomeSelectVisibility: BiomeSelectVisibility = BiomeSelectVisibility.SAFARI_AND_CANYON
 
     @Expose
-    @ConfigOption(
-        name = "Buttons only in inventory",
-        desc = "Hides §e[Switch biome]§7 and §e[Reset run]§7 unless an inventory or chest is open, " +
-            "so you cannot hit them by accident while hunting.",
-    )
-    @ConfigEditorBoolean
-    var switchButtonOnlyInInventory: Boolean = true
-
-    @Expose
     @ConfigOption(name = "HUD background", desc = "Draws a translucent black box behind every HUD block.")
     @ConfigEditorBoolean
     var hudBackground: Boolean = true
-
-    @ConfigOption(
-        name = "HUD positions",
-        desc = "Drag blocks with the mouse, scroll over one to resize it, right click to hide it, " +
-            "press §eR§7 to reset every position.",
-    )
-    @ConfigEditorButton(buttonText = "Edit")
-    val editPositions: Runnable = Runnable {
-        SafariGroupHelper.openScreen(HudEditorScreen(Minecraft.getInstance().screen))
-    }
 }
 
-class ChatConfig {
+class DevConfig {
 
     @Expose
     @ConfigOption(
@@ -140,6 +138,10 @@ class ChatConfig {
 class SghConfig : Config() {
 
     @Expose
+    @Category(name = "Critter Safari", desc = "Tracking unique critters caught by your group")
+    var critterSafari: CritterSafariConfig = CritterSafariConfig()
+
+    @Expose
     @Category(name = "General", desc = "Your biome and how the mod talks to you")
     var general: GeneralConfig = GeneralConfig()
 
@@ -148,8 +150,8 @@ class SghConfig : Config() {
     var hud: HudConfig = HudConfig()
 
     @Expose
-    @Category(name = "Chat", desc = "How Hypixel chat is read")
-    var chat: ChatConfig = ChatConfig()
+    @Category(name = "Dev", desc = "Chat parsing internals and debugging")
+    var dev: DevConfig = DevConfig()
 
     /** Edited by dragging in game, not through the settings screen. */
     @Expose
