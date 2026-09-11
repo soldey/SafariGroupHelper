@@ -74,6 +74,24 @@ class CritterParsingTest {
     }
 
     @Test
+    fun `parses a loot share catch from another player`() {
+        val parsed = parse(
+            "LOOT SHARE! You received a Foxtrot Shard from [MrJerson head]MrJerson catching a Foxtrot!",
+        )
+        assertEquals("Foxtrot", parsed?.critter)
+        assertEquals("MrJerson", parsed?.player)
+    }
+
+    @Test
+    fun `loot share does not credit the local player`() {
+        val parsed = parse(
+            "LOOT SHARE! You received a Mantis Shrimp Shard from MrJerson catching a Mantis Shrimp!",
+        )
+        assertEquals("Mantis Shrimp", parsed?.critter)
+        assertEquals("MrJerson", parsed?.player)
+    }
+
+    @Test
     fun `sparkling critters count as their base critter`() {
         val parsed = parse("CAPTURE! You caught a Sparkling Gemzie and gained a Gemzie Shard!")
         assertEquals("Gemzie", parsed?.critter)

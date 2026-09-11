@@ -7,8 +7,6 @@ import me.kmsold.safarigrouphelper.data.LocationTracker
 import me.kmsold.safarigrouphelper.data.SafariRunController
 import me.kmsold.safarigrouphelper.data.SafariSession
 import me.kmsold.safarigrouphelper.util.ChatOut
-import me.kmsold.safarigrouphelper.util.text
-import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import kotlin.io.path.appendText
@@ -79,7 +77,7 @@ object CritterChatParser {
         val looksRelevant = ChatPatterns.catchKeywords.any { lower.contains(it) } ||
             CritterBiome.allCritters.any { cleaned.contains(it, ignoreCase = true) }
         if (!looksRelevant) return
-        ChatOut.send(text("unparsed: $cleaned", ChatFormatting.RED))
+        ChatOut.send("chat.unparsed", cleaned)
         SafariGroupHelper.logger.info("Unparsed safari line: {}", cleaned)
     }
 
