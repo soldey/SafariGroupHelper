@@ -11,14 +11,11 @@ import me.kmsold.safarigrouphelper.util.TimeFormat
 object SafariRunController {
 
     fun onEnterSafari() {
-        val fresh = SafariSession.startOrResume()
-        if (fresh) {
-            SafariStats.runStarted()
-            val biome = ConfigManager.config.critterSafari.selectedBiome
-            ChatOut.send("chat.runStarted", "${biome.colorCode}${biome.translatedName}")
-        } else {
-            ChatOut.send("chat.runResumed", TimeFormat.clock(SafariSession.elapsedMs))
-        }
+        // Entering always starts from zero; there is no carrying a run over a relog.
+        SafariSession.start()
+        SafariStats.runStarted()
+        val biome = ConfigManager.config.critterSafari.selectedBiome
+        ChatOut.send("chat.runStarted", biome.coloredName)
     }
 
     fun onLeaveSafari() {
@@ -48,7 +45,7 @@ object SafariRunController {
     /** Handles one parsed catch. [player] is null when the parser could not tell who caught it. */
     fun onCatch(critter: String, player: String?) {
         // A catch outside of a tracked run still starts one, e.g. if we missed the enter message.
-        if (!SafariSession.isActive) SafariSession.startOrResume()
+        if (!SafariSession.isActive) SafariSession.start()
 
         val isNew = SafariSession.record(critter, player)
         val biome = CritterBiome.biomeOf(critter)

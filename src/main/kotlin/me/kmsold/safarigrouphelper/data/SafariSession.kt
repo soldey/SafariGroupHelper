@@ -18,7 +18,6 @@ data class SessionState(
     var active: Boolean = false,
     var startedAt: Long = 0L,
     var endedAt: Long = 0L,
-    var leftAt: Long = 0L,
     var completedAt: Long = 0L,
     var completionAnnounced: Boolean = false,
     /** Cleared by a mid-run reset: such a run must not set a personal best. */
@@ -35,9 +34,6 @@ object SafariSession {
 
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val file by lazy { ConfigManager.configDir.resolve("session.json") }
-
-    /** A re-entry within this window is treated as a relog, not as a new run. */
-    private const val RESUME_WINDOW_MS = 3 * 60 * 1000L
 
     var state: SessionState = SessionState()
         private set
@@ -57,31 +53,18 @@ object SafariSession {
         if (state.catches == null) state.catches = LinkedHashMap()
     }
 
-    /**
-     * Starts a new run, unless we very recently left one - then the old run is resumed
-     * (relog / server hop inside the safari).
-     */
-    fun startOrResume(): Boolean {
-        val now = System.currentTimeMillis()
-        val canResume = state.startedAt > 0 && state.leftAt > 0 && now - state.leftAt < RESUME_WINDOW_MS
-        if (canResume) {
-            state.active = true
-            state.endedAt = 0
-            markDirty()
-            return false
-        }
+    /** Throws away whatever was there and starts counting from zero. */
+    fun start() {
         reset()
         state.active = true
-        state.startedAt = now
+        state.startedAt = System.currentTimeMillis()
         markDirty()
-        return true
     }
 
     fun stop() {
         if (!state.active) return
         state.active = false
-        state.leftAt = System.currentTimeMillis()
-        if (state.endedAt == 0L) state.endedAt = state.leftAt
+        if (state.endedAt == 0L) state.endedAt = System.currentTimeMillis()
         markDirty()
     }
 

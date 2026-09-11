@@ -30,7 +30,6 @@
   "hud.block.run_info": "Run info / timer",
   "chat.prefix": "§3[SGH] ",
   "chat.runStarted": "§aRun started. §7Biome: %s",
-  "chat.runResumed": "§7Resumed run at §e%s",
   "chat.runEnded": "§7Run ended after §e%1$s §8- §b%2$d/%3$d unique§7, %4$d repeats",
   "chat.newUnique": "§aNew: §f%1$s §8[%2$s §7%3$d/%4$d§8] §b%5$d/%6$d total",
   "chat.complete": "§6100%% - all §e%1$d §6critters in §e%2$s",

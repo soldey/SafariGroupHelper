@@ -30,7 +30,6 @@
   "hud.block.run_info": "Забег и таймер",
   "chat.prefix": "§3[SGH] ",
   "chat.runStarted": "§aЗабег начат. §7Биом: %s",
-  "chat.runResumed": "§7Забег продолжен с §e%s",
   "chat.runEnded": "§7Забег окончен за §e%1$s §8- §b%2$d/%3$d уникальных§7, %4$d повторов",
   "chat.newUnique": "§aНовый: §f%1$s §8[%2$s §7%3$d/%4$d§8] §b%5$d/%6$d всего",
   "chat.complete": "§6100%% - все §e%1$d §6critters за §e%2$s",

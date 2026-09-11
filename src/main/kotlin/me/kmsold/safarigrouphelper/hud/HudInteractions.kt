@@ -34,14 +34,14 @@ object HudInteractions {
 
     /** Clears the run and restarts the timer right away when we are still inside the safari. */
     fun resetRunNow() {
-        SafariSession.reset()
         if (LocationTracker.inSafari) {
-            SafariSession.startOrResume()
+            SafariSession.start()
             // Resetting without leaving the safari means capsules are already gone, so the new
             // run cannot be measured against the others.
             SafariSession.invalidateForPersonalBest()
             ChatOut.send("chat.runResetInSafari")
         } else {
+            SafariSession.reset()
             ChatOut.send("chat.runReset")
         }
         SafariSession.save()
