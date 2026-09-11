@@ -3,8 +3,9 @@
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
-# Minecraft dev runtime
+# Minecraft dev runtime and the log4j output the tests produce
 run/
+logs/
 
 # IDE
 .idea/
