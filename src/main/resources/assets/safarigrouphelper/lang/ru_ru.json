@@ -112,6 +112,6 @@
   "config.category.runHistory.desc": "Твои последние десять забегов",
   "config.runHistory.history.name": "Последние забеги",
   "config.runHistory.history.desc": "Десять самых свежих забегов, новые сверху.",
-  "config.critterSafariChat.announceBiomeClearedToParty.name": "Писать в пати о зачищенном биоме",
+  "config.critterSafariChat.announceBiomeClearedToParty.name": "Сообщения в пати",
   "config.critterSafariChat.announceBiomeClearedToParty.desc": "Отправляет §e/pc <biome> is cleared§7, когда все critters твоего биома пойманы. Это сообщение уходит в пати, а не только тебе, и всегда на английском."
 }

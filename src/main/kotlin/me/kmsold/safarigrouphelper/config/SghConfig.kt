@@ -102,7 +102,7 @@ class CritterSafariChatConfig {
 
     @Expose
     @ConfigOption(
-        name = "Tell the party when your biome is cleared",
+        name = "Party announcements",
         desc = "Sends §e/pc <biome> is cleared§7 once every critter of your own biome has been " +
             "caught. This one goes to your party, not just to you, and is always in English.",
     )
