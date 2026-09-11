@@ -4,7 +4,6 @@ import me.kmsold.safarigrouphelper.config.ConfigManager
 import me.kmsold.safarigrouphelper.data.CritterBiome
 import me.kmsold.safarigrouphelper.data.SafariSession
 import me.kmsold.safarigrouphelper.util.tr
-import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.screens.Screen
@@ -20,12 +19,13 @@ class BiomeSelectScreen(private val parent: Screen?) : Screen(tr("screen.biomePi
         val startY = height / 2 - (CritterBiome.entries.size * (buttonHeight + 4)) / 2
         CritterBiome.entries.forEachIndexed { index, biome ->
             val selected = biome == ConfigManager.config.general.selectedBiome
-            val label = tr(
-                "screen.biomePicker.option",
-                biome.coloredName,
-                SafariSession.uniques(biome),
-                biome.total,
-            ).apply { if (selected) append(tr("screen.biomePicker.selected")) }
+            // Counters are a Critter Safari thing; outside of it the last run's numbers would
+            // just be stale noise, so only the biome name is shown.
+            val label = if (SafariSession.progressVisible) {
+                tr("screen.biomePicker.option", biome.coloredName, SafariSession.uniques(biome), biome.total)
+            } else {
+                tr("screen.biomePicker.optionPlain", biome.coloredName)
+            }.apply { if (selected) append(tr("screen.biomePicker.selected")) }
             addRenderableWidget(
                 Button.builder(label) {
                     ConfigManager.config.general.selectedBiome = biome

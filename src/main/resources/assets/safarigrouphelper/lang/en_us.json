@@ -70,6 +70,7 @@
 
   "screen.done": "Done",
   "screen.biomePicker.title": "§bPick your biome",
+  "screen.biomePicker.optionPlain": "%s",
   "screen.biomePicker.option": "%1$s §7%2$d/%3$d",
   "screen.biomePicker.selected": " §a(selected)",
   "screen.hudEditor.title": "Safari Group Helper - HUD editor",

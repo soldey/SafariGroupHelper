@@ -38,7 +38,7 @@ object HudContent {
     fun build(block: HudBlock, inInventory: Boolean, editorPreview: Boolean): BlockContent {
         if (!block.pos.enabled) return BlockContent(emptyList())
         val config = ConfigManager.config
-        val showProgress = editorPreview || LocationTracker.inSafari
+        val showProgress = editorPreview || SafariSession.progressVisible
         val selectAllowed = editorPreview || LocationTracker.biomeSelectAllowed(config.hud.biomeSelectVisibility)
         // Clickable lines only exist while a container screen is open, so they cannot be hit by
         // accident while hunting.

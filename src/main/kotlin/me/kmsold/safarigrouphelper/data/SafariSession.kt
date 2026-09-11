@@ -90,6 +90,12 @@ object SafariSession {
 
     val isActive: Boolean get() = state.active
 
+    /**
+     * Whether run progress may be put on screen. Progress is a Critter Safari thing: outside of
+     * it the numbers of the last run are stale, so nothing that counts critters should be drawn.
+     */
+    val progressVisible: Boolean get() = LocationTracker.inSafari
+
     val elapsedMs: Long
         get() {
             if (state.startedAt == 0L) return 0
