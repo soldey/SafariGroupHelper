@@ -43,6 +43,13 @@ sidebar plus the chat message you get when entering the safari.
 | `/sgh reset` | Reset the progress of the current run |
 | `/sgh debug` | Toggle chat parsing debug output |
 
+## Bundled software
+
+The settings screen is built on [MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig),
+which is bundled into the jar under a relocated package so it cannot clash with other mods'
+copies. MoulConfig is licensed under the MPL 2.0; its licence travels with the jar in
+`licenses/MoulConfig-MPL-2.0.txt`. Everything else is MIT, see `LICENSE`.
+
 ## Something broken?
 
 Do not just describe it - **grab the log and send it to me straight away**, otherwise there is
