@@ -129,5 +129,8 @@
   "config.critterSafariHud.showProgressBar.name": "Полоса прогресса",
   "config.critterSafariHud.showProgressBar.desc": "Полоса §a███§7 под общим счётчиком. Выключи, чтобы остались только цифры.",
   "hud.critterBonusCaught": " §6✦ §f%1$s §8x%2$d",
-  "hud.critterBonusMissing": " §8✦ §8%s"
+  "hud.critterBonusMissing": " §8✦ §8%s",
+  "chat.promptAccepted": "§7Ответил critter'у §e[Sure]§7.",
+  "config.critterSafariChat.autoAcceptPrompts.name": "Автоответ на предложения",
+  "config.critterSafariChat.autoAcceptPrompts.desc": "Нажимает за тебя §e[Sure]§7, когда critter о чём-то спрашивает в чате. Это отвечает от твоего имени — оставь выключенным, если хочешь кликать сам."
 }

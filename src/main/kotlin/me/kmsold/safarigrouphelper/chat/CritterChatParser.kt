@@ -32,6 +32,12 @@ object CritterChatParser {
         lastLine = cleaned
         lastLineAt = now
 
+        if (CritterPrompt.handle(message)) return
+
+        // Some lines name a critter without catching it - uncovering a disguised Duplico happens
+        // several times before it is actually captured.
+        if (CritterParsing.matchesAny(cleaned, ChatPatterns.ignore)) return
+
         if (handleLocationLines(cleaned)) return
 
         // A line that names a real critter in a real capture message can only come from inside

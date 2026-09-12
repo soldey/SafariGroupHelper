@@ -153,6 +153,15 @@ class CritterSafariChatConfig {
     )
     @ConfigEditorBoolean
     var announceBiomeClearedToParty: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Auto-accept prompts",
+        desc = "Clicks §e[Sure]§7 for you when a critter asks something in chat. This answers on " +
+            "your behalf, so leave it off if you would rather click yourself.",
+    )
+    @ConfigEditorBoolean
+    var autoAcceptPrompts: Boolean = false
 }
 
 /**
