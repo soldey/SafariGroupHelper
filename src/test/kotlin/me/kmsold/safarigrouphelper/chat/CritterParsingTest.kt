@@ -20,6 +20,7 @@ class CritterParsingTest {
         bundled.getAsJsonArray(key).map { Regex(it.asString) }
 
     private val catchPatterns get() = regexList("catch")
+    private val ignorePatterns get() = regexList("ignore")
     private val enterPatterns get() = regexList("enterSafari")
     private val startPatterns get() = regexList("activityStart")
     private val keywords get() = bundled.getAsJsonArray("catchKeywords").map { it.asString.lowercase() }
@@ -114,6 +115,31 @@ class CritterParsingTest {
     }
 
     @Test
+    fun `uncovering a disguised duplico is not a capture`() {
+        val line = CritterParsing.clean("You found a Duplico that was disguised as a block!")
+        assertTrue(
+            CritterParsing.matchesAny(line, ignorePatterns),
+            "the disguise line must be dropped before any catch parsing",
+        )
+    }
+
+    @Test
+    fun `capturing the duplico still counts`() {
+        val parsed = parse("CAPTURE! You caught a Duplico and gained 2x Duplico Shard!")
+        assertEquals("Duplico", parsed?.critter)
+        assertEquals("You", parsed?.player)
+    }
+
+    @Test
+    fun `another player capturing the duplico counts`() {
+        val parsed = parse(
+            "LOOT SHARE! You received 2x Duplico Shard from [MrJerson head]MrJerson catching a Duplico!",
+        )
+        assertEquals("Duplico", parsed?.critter)
+        assertEquals("MrJerson", parsed?.player)
+    }
+
+    @Test
     fun `ignores unrelated chat`() {
         assertNull(parse("Tom_Fisher: anyone selling a Hyperion?"))
         assertNull(parse("You caught a Cod!"))
@@ -121,8 +147,19 @@ class CritterParsingTest {
 
     @Test
     fun `every biome has its critters`() {
-        assertEquals(37, CritterBiome.totalCritterCount)
+        assertEquals(36, CritterBiome.totalCritterCount, "bonus critters must stay out of the total")
         assertEquals(CritterBiome.CAVERN, CritterBiome.biomeOf("Shyworm"))
         assertEquals(CritterBiome.ICY, CritterBiome.biomeOf("Mantis Shrimp"))
+    }
+
+    @Test
+    fun `macaw is a forest bonus and does not hold a clear back`() {
+        assertEquals(listOf("Macaw"), CritterBiome.FOREST.bonusCritters)
+        assertEquals(8, CritterBiome.FOREST.total)
+        assertTrue(CritterBiome.isBonus("Macaw"))
+        assertTrue(!CritterBiome.isBonus("Parakeet"))
+        // Still a Forest critter as far as parsing and lookups go.
+        assertEquals(CritterBiome.FOREST, CritterBiome.biomeOf("Macaw"))
+        assertEquals("Macaw", parse("CAPTURE! You caught a Macaw and gained a Macaw Shard!")?.critter)
     }
 }

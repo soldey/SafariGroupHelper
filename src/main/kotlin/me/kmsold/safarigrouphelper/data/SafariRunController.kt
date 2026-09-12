@@ -10,27 +10,33 @@ import me.kmsold.safarigrouphelper.util.TimeFormat
  */
 object SafariRunController {
 
+    /**
+     * The chat message and the location packet both announce the same entry, seconds apart. A run
+     * that young is the one they are both talking about, so the second trigger is ignored.
+     */
+    private const val DOUBLE_TRIGGER_MS = 15_000L
+
+    /**
+     * Called on entering the safari, including when hopping straight from one safari into the
+     * next - that is a new run, not a continuation of the old one.
+     */
     fun onEnterSafari() {
-        // Entering always starts from zero; there is no carrying a run over a relog.
-        SafariSession.start()
-        SafariStats.runStarted()
+        if (SafariSession.isActive && SafariSession.elapsedMs < DOUBLE_TRIGGER_MS) return
+        // Going safari -> safari, so the run that was going on still belongs in the history.
+        if (SafariSession.isActive) fileRun()
+
         val biome = ConfigManager.config.critterSafari.selectedBiome
+        SafariSession.start()
+        SafariStats.runStarted(biome)
+        // You are in the run even before catching anything, and you never show up in chat.
+        localPlayerName()?.let { SafariSession.addPlayer(it) }
         ChatOut.send("chat.runStarted", biome.coloredName)
     }
 
     fun onLeaveSafari() {
         if (!SafariSession.isActive) return
         val elapsed = SafariSession.elapsedMs
-        SafariStats.recordRun(
-            RunRecord(
-                startedAt = SafariSession.state.startedAt,
-                durationMs = elapsed,
-                uniques = SafariSession.uniqueTotal,
-                total = CritterBiome.totalCritterCount,
-                completed = SafariSession.isComplete,
-                valid = SafariSession.validForPersonalBest,
-            ),
-        )
+        fileRun()
         SafariSession.stop()
         SafariSession.save()
         ChatOut.send(
@@ -41,6 +47,29 @@ object SafariRunController {
             SafariSession.duplicates,
         )
     }
+
+    /** Puts the run that is going on right now into the history. */
+    private fun fileRun() {
+        val clears = CritterBiome.entries.mapNotNull { biome ->
+            val at = SafariSession.clearedAt(biome) ?: return@mapNotNull null
+            BiomeClear(biome.name, at, SafariSession.contributors(biome).toMutableList())
+        }
+        SafariStats.recordRun(
+            RunRecord(
+                startedAt = SafariSession.state.startedAt,
+                durationMs = SafariSession.elapsedMs,
+                uniques = SafariSession.uniqueTotal,
+                total = CritterBiome.totalCritterCount,
+                completed = SafariSession.isComplete,
+                valid = SafariSession.validForPersonalBest,
+                players = SafariSession.players.toMutableList(),
+                biomeClears = clears.toMutableList(),
+            ),
+        )
+    }
+
+    private fun localPlayerName(): String? =
+        net.minecraft.client.Minecraft.getInstance().player?.gameProfile?.name
 
     /** Handles one parsed catch. [player] is null when the parser could not tell who caught it. */
     fun onCatch(critter: String, player: String?) {
@@ -62,7 +91,7 @@ object SafariRunController {
             )
         }
 
-        onBiomeCleared()
+        checkBiomeClears()
         if (SafariSession.isComplete) checkCompletion()
     }
 
@@ -71,13 +100,21 @@ object SafariRunController {
      * own chat, the party line is optional, and the best time per biome is kept like the overall
      * personal best.
      */
-    private fun onBiomeCleared() {
-        val biome = ConfigManager.config.critterSafari.selectedBiome
-        if (!SafariSession.isCleared(biome)) return
-        if (!SafariSession.markBiomeAnnounced(biome)) return
+    private fun checkBiomeClears() {
+        for (biome in CritterBiome.entries) {
+            if (!SafariSession.isCleared(biome)) continue
+            if (!SafariSession.markBiomeCleared(biome)) continue
+            val at = SafariSession.clearedAt(biome) ?: SafariSession.elapsedMs
+            val who = SafariSession.contributors(biome).joinToString(", ").ifEmpty { "-" }
+            ChatOut.send("chat.biomeCleared", biome.coloredName, TimeFormat.clock(at), who)
+            if (biome == ConfigManager.config.critterSafari.selectedBiome) onOwnBiomeCleared(biome)
+        }
+    }
 
-        val duration = SafariSession.elapsedMs
-        ChatOut.send("chat.biomeCleared", biome.coloredName, TimeFormat.clock(duration))
+    /** The biome this player covers also feeds the party message and the per-biome best time. */
+    private fun onOwnBiomeCleared(biome: CritterBiome) {
+        if (!SafariSession.markBiomeAnnounced(biome)) return
+        val duration = SafariSession.clearedAt(biome) ?: SafariSession.elapsedMs
 
         if (ConfigManager.config.critterSafari.chat.announceBiomeClearedToParty) {
             // Deliberately English and in Hypixel's own wording: the party has to read it.

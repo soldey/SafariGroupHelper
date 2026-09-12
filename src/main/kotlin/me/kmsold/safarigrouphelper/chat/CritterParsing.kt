@@ -26,13 +26,20 @@ object CritterParsing {
         .trim()
 
     /** Runs the configured patterns first, then falls back to [heuristicCatch]. */
-    fun parseCatch(cleaned: String, patterns: List<Regex>, keywords: List<String>): ParsedCatch? {
+    fun parseCatch(cleaned: String, patterns: List<Regex>, keywords: List<String>): ParsedCatch? =
+        parsePatternCatch(cleaned, patterns) ?: heuristicCatch(cleaned, keywords)
+
+    /**
+     * Only the configured patterns. A hit here is solid enough to act on even when the mod is not
+     * sure it is inside the safari yet.
+     */
+    fun parsePatternCatch(cleaned: String, patterns: List<Regex>): ParsedCatch? {
         for (pattern in patterns) {
             val match = pattern.find(cleaned) ?: continue
             val critter = match.group("critter")?.let { CritterBiome.canonical(it) } ?: continue
             return ParsedCatch(critter, match.group("player"))
         }
-        return heuristicCatch(cleaned, keywords)
+        return null
     }
 
     /**

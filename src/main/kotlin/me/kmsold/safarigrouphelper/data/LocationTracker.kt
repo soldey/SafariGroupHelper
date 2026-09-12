@@ -25,8 +25,18 @@ object LocationTracker {
     const val SAFARI_MODE = "safari"
     const val CANYON_MODE = "foraging_3"
 
+    /**
+     * The chat message beats the sidebar to the punch by a second or two, during which the
+     * sidebar still shows the area we just left. It must not cancel the chat signal in that
+     * window, or the run would start and immediately stop again.
+     */
+    private const val CHAT_TRUST_MS = 15_000L
+
     private val formattingCodes = Regex("§.")
     private const val AREA_MARKER = "⏣"
+
+    /** Only the safari sidebar counts captured mobs, so the line alone gives us away. */
+    private val safariSidebarMarker = Regex("Captured Mobs:\\s*\\d+")
 
     var apiMode: String? = null
         private set
@@ -50,24 +60,36 @@ object LocationTracker {
         private set
 
     private var chatEnter = false
+    private var chatEnterAt = 0L
 
-    fun onLocationPacket(mode: String?, map: String?) {
+    /** Which safari instance we are on, so a safari -> safari hop is not mistaken for staying put. */
+    private var safariServer: String? = null
+
+    fun onLocationPacket(serverName: String?, mode: String?, map: String?) {
         apiAvailable = true
         apiMode = mode
         apiMap = map
-        update()
+        val safari = mode == SAFARI_MODE
+        // Hypixel hands out a different server per safari, so a new name means a new run.
+        val newInstance = safari && serverName != null && safariServer != null && serverName != safariServer
+        safariServer = if (safari) serverName else null
+        update(newInstance)
     }
 
     /** Called when we saw our own "entered Critter Safari!" message. */
     fun onChatEnteredSafari() {
         chatEnter = true
-        update()
+        chatEnterAt = System.currentTimeMillis()
+        // Entering is entering, even when we were already counted as inside: going straight from
+        // one safari into the next has to start a new run rather than continue the old one.
+        update(newInstance = true)
     }
 
     fun onDisconnect() {
         apiMode = null
         apiMap = null
         chatEnter = false
+        safariServer = null
         sidebarLines = emptyList()
         update()
     }
@@ -77,21 +99,27 @@ object LocationTracker {
         update()
     }
 
-    private fun update() {
+    private fun update(newInstance: Boolean = false) {
         val area = areaLine
-        val sidebarSafari = area?.contains("Safari", ignoreCase = true) == true
+        val sidebarSafari = area?.contains("Safari", ignoreCase = true) == true ||
+            sidebarLines.any { safariSidebarMarker.containsMatchIn(it) }
         val sidebarCanyon = area?.contains("Torrhus", ignoreCase = true) == true ||
             area?.contains("Canyon", ignoreCase = true) == true
 
         val apiSafari = apiAvailable && apiMode == SAFARI_MODE
         val apiElsewhere = apiAvailable && apiMode != null && apiMode != SAFARI_MODE
+        val chatIsFresh = System.currentTimeMillis() - chatEnterAt < CHAT_TRUST_MS
 
-        // Drop the chat signal only when something authoritative disagrees.
-        if (apiElsewhere || (area != null && !sidebarSafari)) chatEnter = false
+        // Drop the chat signal when something authoritative disagrees - but give the sidebar a
+        // moment to catch up first, otherwise it cancels the signal with a stale area.
+        if (apiElsewhere || (area != null && !sidebarSafari && !chatIsFresh)) chatEnter = false
 
         inCanyon = (apiAvailable && apiMode == CANYON_MODE) || sidebarCanyon
         val safari = apiSafari || sidebarSafari || chatEnter
-        if (safari == inSafari) return
+        if (safari == inSafari) {
+            if (safari && newInstance) SafariRunController.onEnterSafari()
+            return
+        }
         inSafari = safari
         if (safari) SafariRunController.onEnterSafari() else SafariRunController.onLeaveSafari()
     }

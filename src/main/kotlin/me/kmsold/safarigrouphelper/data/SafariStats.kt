@@ -19,6 +19,8 @@ data class StatsState(
     var runs: MutableList<RunRecord> = ArrayList(),
     /** Fastest clear of a single biome, keyed by [CritterBiome.name]. */
     var biomeBest: MutableMap<String, Long> = LinkedHashMap(),
+    /** How many runs were started while covering each biome, keyed by [CritterBiome.name]. */
+    var runsByBiome: MutableMap<String, Int> = LinkedHashMap(),
 )
 
 /** Long-lived statistics that survive across runs: personal best and lifetime duplicate counts. */
@@ -46,6 +48,8 @@ object SafariStats {
         if (state.runs == null) state.runs = ArrayList()
         @Suppress("SENSELESS_COMPARISON")
         if (state.biomeBest == null) state.biomeBest = LinkedHashMap()
+        @Suppress("SENSELESS_COMPARISON")
+        if (state.runsByBiome == null) state.runsByBiome = LinkedHashMap()
     }
 
     fun addDuplicate(critter: String) {
@@ -62,8 +66,9 @@ object SafariStats {
         SghConfigGui.invalidate()
     }
 
-    fun runStarted() {
+    fun runStarted(biome: CritterBiome) {
         state.runsStarted++
+        state.runsByBiome[biome.name] = (state.runsByBiome[biome.name] ?: 0) + 1
         dirty = true
     }
 
@@ -104,6 +109,8 @@ object SafariStats {
 
     fun save() {
         dirty = false
+        // The settings screen bakes these numbers in when it is built.
+        SghConfigGui.invalidate()
         runCatching { file.writeText(gson.toJson(state)) }
             .onFailure { SafariGroupHelper.logger.error("Could not write stats.json", it) }
     }

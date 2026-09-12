@@ -25,6 +25,12 @@ data class SessionState(
     var totalCatches: Int = 0,
     /** Biomes already announced to the party this run, so it is said once and only once. */
     var announcedBiomes: MutableSet<String> = LinkedHashSet(),
+    /** Everyone seen catching something this run, plus the local player. */
+    var players: MutableSet<String> = LinkedHashSet(),
+    /** player -> biome name -> how many catches, used to work out who covered which biome. */
+    var catchesByPlayer: MutableMap<String, MutableMap<String, Int>> = LinkedHashMap(),
+    /** biome name -> how far into the run it was cleared, in milliseconds. */
+    var biomeClearedAt: MutableMap<String, Long> = LinkedHashMap(),
     var catches: MutableMap<String, CatchEntry> = LinkedHashMap(),
 )
 
@@ -55,6 +61,12 @@ object SafariSession {
         if (state.catches == null) state.catches = LinkedHashMap()
         @Suppress("SENSELESS_COMPARISON")
         if (state.announcedBiomes == null) state.announcedBiomes = LinkedHashSet()
+        @Suppress("SENSELESS_COMPARISON")
+        if (state.players == null) state.players = LinkedHashSet()
+        @Suppress("SENSELESS_COMPARISON")
+        if (state.catchesByPlayer == null) state.catchesByPlayer = LinkedHashMap()
+        @Suppress("SENSELESS_COMPARISON")
+        if (state.biomeClearedAt == null) state.biomeClearedAt = LinkedHashMap()
     }
 
     /** Throws away whatever was there and starts counting from zero. */
@@ -115,8 +127,42 @@ object SafariSession {
         if (isNew) entry.firstBy = player
         state.totalCatches++
         if (!isNew) SafariStats.addDuplicate(critter)
+
+        if (player != null) {
+            addPlayer(player)
+            CritterBiome.biomeOf(critter)?.let { biome ->
+                val perBiome = state.catchesByPlayer.getOrPut(player) { LinkedHashMap() }
+                perBiome[biome.name] = (perBiome[biome.name] ?: 0) + 1
+            }
+        }
         markDirty()
         return isNew
+    }
+
+    /** The local player belongs in the list even before they catch anything. */
+    fun addPlayer(player: String) {
+        if (state.players.add(player)) markDirty()
+    }
+
+    /** Everyone who hunted this run, the biggest contributors first. */
+    val players: List<String>
+        get() = state.players.sortedByDescending { player ->
+            state.catchesByPlayer[player]?.values?.sum() ?: 0
+        }
+
+    /** Who worked this biome, the one with the most catches in it first. */
+    fun contributors(biome: CritterBiome): List<String> = state.players
+        .filter { (state.catchesByPlayer[it]?.get(biome.name) ?: 0) > 0 }
+        .sortedByDescending { state.catchesByPlayer[it]?.get(biome.name) ?: 0 }
+
+    fun clearedAt(biome: CritterBiome): Long? = state.biomeClearedAt[biome.name]
+
+    /** Stamps the moment a biome was finished. @return true the first time for this biome. */
+    fun markBiomeCleared(biome: CritterBiome): Boolean {
+        if (state.biomeClearedAt.containsKey(biome.name)) return false
+        state.biomeClearedAt[biome.name] = elapsedMs
+        markDirty()
+        return true
     }
 
     fun countOf(critter: String): Int = state.catches[critter]?.count ?: 0

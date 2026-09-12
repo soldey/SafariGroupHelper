@@ -1,8 +1,10 @@
 name: Publish to Modrinth
 
-# Publishes a version that already exists as a GitHub release. Useful for backfilling versions
-# that were released before Modrinth was set up, or for retrying after an API hiccup.
-# Run it from the Actions tab and give it a version like 1.5.1.
+# Publishes a version that already exists as a GitHub release. Meant as a retry button for when
+# the Modrinth API fails during a release. Run it from the Actions tab with a version like 1.5.1.
+#
+# Do not use it to backfill old versions: Modrinth orders the version list by publication date,
+# so an older version uploaded later ends up sitting above the current one.
 on:
   workflow_dispatch:
     inputs:

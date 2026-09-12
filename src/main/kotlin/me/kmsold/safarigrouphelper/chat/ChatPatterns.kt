@@ -23,6 +23,10 @@ object ChatPatterns {
         private set
     var activityStart: List<Regex> = emptyList()
         private set
+
+    /** Lines that name a critter without being a capture, dropped before anything else looks at them. */
+    var ignore: List<Regex> = emptyList()
+        private set
     var catchKeywords: List<String> = listOf("caught", "captured")
         private set
 
@@ -55,6 +59,7 @@ object ChatPatterns {
         catchPatterns = json.regexList("catch")
         enterSafari = json.regexList("enterSafari")
         activityStart = json.regexList("activityStart")
+        ignore = json.regexList("ignore")
         json.get("catchKeywords")?.asJsonArray?.let { array ->
             catchKeywords = array.map { it.asString.lowercase() }
         }

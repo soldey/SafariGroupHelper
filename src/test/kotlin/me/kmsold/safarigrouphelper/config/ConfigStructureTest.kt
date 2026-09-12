@@ -42,7 +42,7 @@ class ConfigStructureTest {
     fun `critter safari keeps its main options and gains subcategories`() {
         val categories = categories()
         val safari = categories.values.single { it.title == "Critter Safari" }
-        assertEquals(listOf("Enabled", "My biome"), safari.options)
+        assertEquals(listOf("Your records", "Enabled", "My biome"), safari.options)
 
         val safariId = categories.entries.single { it.value.title == "Critter Safari" }.key
         val children = categories.values.filter { it.parent == safariId }.map { it.title }

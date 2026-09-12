@@ -2,11 +2,15 @@ package me.kmsold.safarigrouphelper.config
 
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
+import io.github.notenoughupdates.moulconfig.gui.GuiComponent
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
-import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorInfoText
+import io.github.notenoughupdates.moulconfig.gui.component.ColumnComponent
+import io.github.notenoughupdates.moulconfig.gui.component.TextComponent
+import io.github.notenoughupdates.moulconfig.gui.editors.ComponentEditor
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import me.kmsold.safarigrouphelper.data.RunHistory
+import me.kmsold.safarigrouphelper.data.SafariSummary
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOptionImpl
 import me.kmsold.safarigrouphelper.l10n.Localization
 import java.lang.reflect.Field
@@ -33,12 +37,37 @@ class LocalizedConfigProcessor(config: SghConfig) : MoulConfigProcessor<SghConfi
         )
     }
 
-    /** The run history is generated, not configured, so it gets its text here. */
+    /**
+     * The run history is generated, not configured. A plain info text collapses it into one
+     * clipped line, so it gets a column of rows instead - that reports its real height and fills
+     * the page.
+     */
     override fun createOptionGui(option: ProcessedOption, field: Field, configOption: ConfigOption): GuiOptionEditor {
-        if (field.declaringClass == RunHistoryConfig::class.java) {
-            return GuiOptionEditorInfoText(option, StructuredText.of(RunHistory.summary()))
+        if (field.declaringClass == RunHistoryConfig::class.java) return LinesEditor(option, RunHistory::lines)
+        if (field.declaringClass == CritterSafariConfig::class.java && field.name == "records") {
+            return LinesEditor(option, SafariSummary::lines)
         }
         return super.createOptionGui(option, field, configOption)
+    }
+
+    /** Renders generated text as one row per line, stacked, so the block reports its real height. */
+    private class LinesEditor(
+        option: ProcessedOption,
+        private val lines: () -> List<String>,
+    ) : ComponentEditor(option) {
+
+        // Built on first render: a TextComponent needs the font renderer, which only exists once
+        // the game is up.
+        private val rows: GuiComponent by lazy {
+            ColumnComponent(lines().map { TextComponent(StructuredText.of(it), ROW_WIDTH) })
+        }
+
+        override fun getDelegate(): GuiComponent = rows
+
+        private companion object {
+            /** Wrap width of a row; long lines fold rather than being cut off. */
+            const val ROW_WIDTH = 340
+        }
     }
 
     override fun createProcessedOption(container: Any, field: Field, option: ConfigOption): ProcessedOptionImpl {

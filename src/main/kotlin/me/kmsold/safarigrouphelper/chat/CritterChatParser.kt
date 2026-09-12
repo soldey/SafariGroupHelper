@@ -32,17 +32,33 @@ object CritterChatParser {
         lastLine = cleaned
         lastLineAt = now
 
+        if (CritterPrompt.handle(message)) return
+
+        // Some lines name a critter without catching it - uncovering a disguised Duplico happens
+        // several times before it is actually captured.
+        if (CritterParsing.matchesAny(cleaned, ChatPatterns.ignore)) return
+
         if (handleLocationLines(cleaned)) return
+
+        // A line that names a real critter in a real capture message can only come from inside
+        // the safari, so it is trusted even when the location sources have not caught up yet.
+        val strict = CritterParsing.parsePatternCatch(cleaned, ChatPatterns.catchPatterns)
+        if (strict != null) {
+            if (!LocationTracker.inSafari) LocationTracker.onChatEnteredSafari()
+            debugLog(cleaned)
+            SafariRunController.onCatch(strict.critter, resolvePlayer(strict.player))
+            return
+        }
 
         if (ConfigManager.config.dev.parseOnlyInSafari && !LocationTracker.inSafari) return
         debugLog(cleaned)
 
-        val parsed = CritterParsing.parseCatch(cleaned, ChatPatterns.catchPatterns, ChatPatterns.catchKeywords)
-        if (parsed == null) {
+        val loose = CritterParsing.heuristicCatch(cleaned, ChatPatterns.catchKeywords)
+        if (loose == null) {
             reportUnparsed(cleaned)
             return
         }
-        SafariRunController.onCatch(parsed.critter, resolvePlayer(parsed.player))
+        SafariRunController.onCatch(loose.critter, resolvePlayer(loose.player))
     }
 
     /** Entering the safari and the Safari Manager's send-off both start a run. */
