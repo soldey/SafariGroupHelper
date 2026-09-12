@@ -88,7 +88,7 @@
   "chat.runResetInSafari": "§eПрогресс забега сброшен. §7Этот забег больше не идёт в личный рекорд.",
   "chat.completionNotCounted": "§7Забег сбрасывали посреди сафари, поэтому он не идёт в личный рекорд.",
   "runHistory.empty": "§7Забегов пока нет.",
-  "runHistory.line": "§8%1$d. §7%2$s §8| §b%3$d/%4$d §8| §e%5$s%6$s",
+  "runHistory.line": "§b%1$d. §7%2$s §8· §b%3$d/%4$d §8· §e%5$s%6$s",
   "runHistory.complete": " §a✔",
   "runHistory.invalid": " §c(сброс)",
   "config.critterSafari.selectedBiome.name": "Мой биом",
@@ -109,7 +109,7 @@
   "config.runHistory.history.desc": "Десять самых свежих забегов, новые сверху.",
   "config.critterSafariChat.announceBiomeClearedToParty.name": "Сообщения в пати",
   "config.critterSafariChat.announceBiomeClearedToParty.desc": "Отправляет §e/pc <biome> is cleared§7, когда все critters твоего биома пойманы. Это сообщение уходит в пати, а не только тебе, и всегда на английском.",
-  "chat.biomeCleared": "§a%1$s §7зачищен за §e%2$s",
+  "chat.biomeCleared": "§a%1$s §7зачищен за §e%2$s §8(%3$s)",
   "chat.biomeClearFirstBest": "§dПервая зачистка этого биома - это твой рекорд!",
   "chat.biomeClearNewBest": "§dНОВЫЙ РЕКОРД БИОМА! §7(было: %1$s, §a-%2$s§7)",
   "chat.biomeClearKept": "§7Рекорд биома остаётся §e%1$s §c(+%2$s)",
@@ -132,5 +132,7 @@
   "hud.critterBonusMissing": " §8✦ §8%s",
   "chat.promptAccepted": "§7Ответил critter'у §e[Sure]§7.",
   "config.critterSafariChat.autoAcceptPrompts.name": "Автоответ на предложения",
-  "config.critterSafariChat.autoAcceptPrompts.desc": "Нажимает за тебя §e[Sure]§7, когда critter о чём-то спрашивает в чате. Это отвечает от твоего имени — оставь выключенным, если хочешь кликать сам."
+  "config.critterSafariChat.autoAcceptPrompts.desc": "Нажимает за тебя §e[Sure]§7, когда critter о чём-то спрашивает в чате. Это отвечает от твоего имени — оставь выключенным, если хочешь кликать сам.",
+  "runHistory.players": "§8   §7%s",
+  "runHistory.biomeClear": "§8   %1$s §e%2$s §8(%3$s)"
 }
