@@ -170,7 +170,7 @@ class CritterSafariChatConfig {
  */
 class RunHistoryConfig {
 
-    @ConfigOption(name = "Last runs", desc = "The ten most recent runs, newest first.")
+    @ConfigOption(name = "Last runs", desc = "The 10 most recent runs, newest first.")
     @ConfigEditorInfoText(infoTitle = "")
     val history: String = ""
 }
@@ -204,7 +204,7 @@ class CritterSafariConfig {
     var chat: CritterSafariChatConfig = CritterSafariChatConfig()
 
     @Expose
-    @Category(name = "Run history", desc = "Your last ten runs")
+    @Category(name = "Run history", desc = "Your last 10 runs")
     var runHistory: RunHistoryConfig = RunHistoryConfig()
 }
 

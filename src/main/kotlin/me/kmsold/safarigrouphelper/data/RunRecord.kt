@@ -43,6 +43,7 @@ object RunHistory {
 
         val lines = ArrayList<String>()
         runs.forEachIndexed { index, run ->
+            if (index > 0) lines += Localization.tr("runHistory.separator")
             val flag = when {
                 !run.valid -> Localization.tr("runHistory.invalid")
                 run.completed -> Localization.tr("runHistory.complete")

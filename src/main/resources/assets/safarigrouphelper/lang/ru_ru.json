@@ -104,9 +104,9 @@
   "config.category.chat.name": "Чат",
   "config.category.chat.desc": "Что модуль пишет в чат",
   "config.category.runHistory.name": "История забегов",
-  "config.category.runHistory.desc": "Твои последние десять забегов",
+  "config.category.runHistory.desc": "Твои последние 10 забегов",
   "config.runHistory.history.name": "Последние забеги",
-  "config.runHistory.history.desc": "Десять самых свежих забегов, новые сверху.",
+  "config.runHistory.history.desc": "10 самых свежих забегов, новые сверху.",
   "config.critterSafariChat.announceBiomeClearedToParty.name": "Сообщения в пати",
   "config.critterSafariChat.announceBiomeClearedToParty.desc": "Отправляет §e/pc <biome> is cleared§7, когда все critters твоего биома пойманы. Это сообщение уходит в пати, а не только тебе, и всегда на английском.",
   "chat.biomeCleared": "§a%1$s §7зачищен за §e%2$s §8(%3$s)",
@@ -134,5 +134,6 @@
   "config.critterSafariChat.autoAcceptPrompts.name": "Автоответ на предложения",
   "config.critterSafariChat.autoAcceptPrompts.desc": "Нажимает за тебя §e[Sure]§7, когда critter о чём-то спрашивает в чате. Это отвечает от твоего имени — оставь выключенным, если хочешь кликать сам.",
   "runHistory.players": "§8   §7%s",
-  "runHistory.biomeClear": "§8   %1$s §e%2$s §8(%3$s)"
+  "runHistory.biomeClear": "§8   %1$s §e%2$s §8(%3$s)",
+  "runHistory.separator": "§8----------------------------------------"
 }
