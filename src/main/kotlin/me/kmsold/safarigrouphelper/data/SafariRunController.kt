@@ -25,11 +25,11 @@ object SafariRunController {
         // Going safari -> safari, so the run that was going on still belongs in the history.
         if (SafariSession.isActive) fileRun()
 
+        val biome = ConfigManager.config.critterSafari.selectedBiome
         SafariSession.start()
-        SafariStats.runStarted()
+        SafariStats.runStarted(biome)
         // You are in the run even before catching anything, and you never show up in chat.
         localPlayerName()?.let { SafariSession.addPlayer(it) }
-        val biome = ConfigManager.config.critterSafari.selectedBiome
         ChatOut.send("chat.runStarted", biome.coloredName)
     }
 

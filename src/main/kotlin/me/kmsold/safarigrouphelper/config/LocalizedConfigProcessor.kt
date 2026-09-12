@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.gui.editors.ComponentEditor
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import me.kmsold.safarigrouphelper.data.RunHistory
+import me.kmsold.safarigrouphelper.data.SafariSummary
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOptionImpl
 import me.kmsold.safarigrouphelper.l10n.Localization
 import java.lang.reflect.Field
@@ -42,17 +43,23 @@ class LocalizedConfigProcessor(config: SghConfig) : MoulConfigProcessor<SghConfi
      * the page.
      */
     override fun createOptionGui(option: ProcessedOption, field: Field, configOption: ConfigOption): GuiOptionEditor {
-        if (field.declaringClass == RunHistoryConfig::class.java) return RunHistoryEditor(option)
+        if (field.declaringClass == RunHistoryConfig::class.java) return LinesEditor(option, RunHistory::lines)
+        if (field.declaringClass == CritterSafariConfig::class.java && field.name == "records") {
+            return LinesEditor(option, SafariSummary::lines)
+        }
         return super.createOptionGui(option, field, configOption)
     }
 
-    /** Renders the history as one text row per line, stacked. */
-    private class RunHistoryEditor(option: ProcessedOption) : ComponentEditor(option) {
+    /** Renders generated text as one row per line, stacked, so the block reports its real height. */
+    private class LinesEditor(
+        option: ProcessedOption,
+        private val lines: () -> List<String>,
+    ) : ComponentEditor(option) {
 
         // Built on first render: a TextComponent needs the font renderer, which only exists once
         // the game is up.
         private val rows: GuiComponent by lazy {
-            ColumnComponent(RunHistory.lines().map { TextComponent(StructuredText.of(it), ROW_WIDTH) })
+            ColumnComponent(lines().map { TextComponent(StructuredText.of(it), ROW_WIDTH) })
         }
 
         override fun getDelegate(): GuiComponent = rows

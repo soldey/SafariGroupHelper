@@ -135,5 +135,10 @@
   "config.critterSafariChat.autoAcceptPrompts.desc": "Нажимает за тебя §e[Sure]§7, когда critter о чём-то спрашивает в чате. Это отвечает от твоего имени — оставь выключенным, если хочешь кликать сам.",
   "runHistory.players": "§8   §7%s",
   "runHistory.biomeClear": "§8   %1$s §e%2$s §8(%3$s)",
-  "runHistory.separator": "§8----------------------------------------"
+  "runHistory.separator": "§8----------------------------------------",
+  "summary.total": "§7Личный рекорд §e%1$s §8· §7забегов §b%2$d §8(%3$d полных)",
+  "summary.biome": "§8   %1$s §e%2$s §8· §b%3$d забегов",
+  "summary.never": "-",
+  "config.critterSafari.records.name": "Твои рекорды",
+  "config.critterSafari.records.desc": "Лучшее время и количество забегов — всего и по биомам."
 }

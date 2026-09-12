@@ -85,5 +85,8 @@
   "chat.promptAccepted": "§7Answered the critter prompt with §e[Sure]§7.",
   "runHistory.players": "§8   §7%s",
   "runHistory.biomeClear": "§8   %1$s §e%2$s §8(%3$s)",
-  "runHistory.separator": "§8----------------------------------------"
+  "runHistory.separator": "§8----------------------------------------",
+  "summary.total": "§7Personal best §e%1$s §8· §7runs §b%2$d §8(%3$d completed)",
+  "summary.biome": "§8   %1$s §e%2$s §8· §b%3$d runs",
+  "summary.never": "-"
 }
