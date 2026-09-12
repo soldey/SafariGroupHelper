@@ -83,6 +83,10 @@ tasks.test {
 }
 
 loom {
+    // MoulConfig needs a few private GuiGraphicsExtractor members; without this the settings
+    // screen crashes with IllegalAccessError on any setup that has no other mod widening them.
+    accessWidenerPath.set(file("src/main/resources/safarigrouphelper.classtweaker"))
+
     runs {
         named("client") {
             isIdeConfigGenerated = true
