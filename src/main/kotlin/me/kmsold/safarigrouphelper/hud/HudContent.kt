@@ -63,6 +63,7 @@ object HudContent {
         }
         if (showProgress) {
             for (critter in biome.critters) lines += critterLine(critter)
+            for (critter in biome.bonusCritters) lines += critterLine(critter, bonus = true)
         }
         val buttons = ArrayList<HudButton>()
         if (showButton) {
@@ -72,9 +73,11 @@ object HudContent {
         return BlockContent(lines, buttons)
     }
 
-    private fun critterLine(critter: String): Component {
+    private fun critterLine(critter: String, bonus: Boolean = false): Component {
         val count = SafariSession.countOf(critter)
         return when {
+            bonus && count > 0 -> tr("hud.critterBonusCaught", critter, count)
+            bonus -> tr("hud.critterBonusMissing", critter)
             count > 1 -> tr("hud.critterCaughtRepeat", critter, count)
             count == 1 -> tr("hud.critterCaught", critter)
             else -> tr("hud.critterMissing", critter)

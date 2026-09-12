@@ -79,5 +79,7 @@
   "chat.biomeClearFirstBest": "§dFirst clear of this biome - new personal best!",
   "chat.biomeClearNewBest": "§dNEW BIOME BEST! §7(old: %1$s, §a-%2$s§7)",
   "chat.biomeClearKept": "§7Biome best stays at §e%1$s §c(+%2$s)",
-  "chat.biomeClearNotCounted": "§7The run was reset partway, so this clear does not count."
+  "chat.biomeClearNotCounted": "§7The run was reset partway, so this clear does not count.",
+  "hud.critterBonusCaught": " §6✦ §f%1$s §8x%2$d",
+  "hud.critterBonusMissing": " §8✦ §8%s"
 }

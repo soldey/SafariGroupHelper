@@ -121,8 +121,19 @@ class CritterParsingTest {
 
     @Test
     fun `every biome has its critters`() {
-        assertEquals(37, CritterBiome.totalCritterCount)
+        assertEquals(36, CritterBiome.totalCritterCount, "bonus critters must stay out of the total")
         assertEquals(CritterBiome.CAVERN, CritterBiome.biomeOf("Shyworm"))
         assertEquals(CritterBiome.ICY, CritterBiome.biomeOf("Mantis Shrimp"))
+    }
+
+    @Test
+    fun `macaw is a forest bonus and does not hold a clear back`() {
+        assertEquals(listOf("Macaw"), CritterBiome.FOREST.bonusCritters)
+        assertEquals(8, CritterBiome.FOREST.total)
+        assertTrue(CritterBiome.isBonus("Macaw"))
+        assertTrue(!CritterBiome.isBonus("Parakeet"))
+        // Still a Forest critter as far as parsing and lookups go.
+        assertEquals(CritterBiome.FOREST, CritterBiome.biomeOf("Macaw"))
+        assertEquals("Macaw", parse("CAPTURE! You caught a Macaw and gained a Macaw Shard!")?.critter)
     }
 }
