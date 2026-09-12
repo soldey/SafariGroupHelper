@@ -35,6 +35,9 @@ object LocationTracker {
     private val formattingCodes = Regex("§.")
     private const val AREA_MARKER = "⏣"
 
+    /** Only the safari sidebar counts captured mobs, so the line alone gives us away. */
+    private val safariSidebarMarker = Regex("Captured Mobs:\\s*\\d+")
+
     var apiMode: String? = null
         private set
     var apiMap: String? = null
@@ -98,7 +101,8 @@ object LocationTracker {
 
     private fun update(newInstance: Boolean = false) {
         val area = areaLine
-        val sidebarSafari = area?.contains("Safari", ignoreCase = true) == true
+        val sidebarSafari = area?.contains("Safari", ignoreCase = true) == true ||
+            sidebarLines.any { safariSidebarMarker.containsMatchIn(it) }
         val sidebarCanyon = area?.contains("Torrhus", ignoreCase = true) == true ||
             area?.contains("Canyon", ignoreCase = true) == true
 
