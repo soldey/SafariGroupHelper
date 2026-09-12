@@ -19,8 +19,9 @@ object HypixelLocationApi {
         api.createHandler(ClientboundLocationPacket::class.java) { packet ->
             val mode = packet.mode.getOrNull()
             val map = packet.map.getOrNull()
-            SafariGroupHelper.logger.debug("Hypixel location: mode={} map={}", mode, map)
-            LocationTracker.onLocationPacket(mode, map)
+            val server = packet.serverName
+            SafariGroupHelper.logger.debug("Hypixel location: server={} mode={} map={}", server, mode, map)
+            LocationTracker.onLocationPacket(server, mode, map)
         }
         SafariGroupHelper.logger.info("Using hypixel-mod-api for location detection")
     }

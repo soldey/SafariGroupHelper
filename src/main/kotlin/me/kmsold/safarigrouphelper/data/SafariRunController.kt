@@ -10,8 +10,21 @@ import me.kmsold.safarigrouphelper.util.TimeFormat
  */
 object SafariRunController {
 
+    /**
+     * The chat message and the location packet both announce the same entry, seconds apart. A run
+     * that young is the one they are both talking about, so the second trigger is ignored.
+     */
+    private const val DOUBLE_TRIGGER_MS = 15_000L
+
+    /**
+     * Called on entering the safari, including when hopping straight from one safari into the
+     * next - that is a new run, not a continuation of the old one.
+     */
     fun onEnterSafari() {
-        // Entering always starts from zero; there is no carrying a run over a relog.
+        if (SafariSession.isActive && SafariSession.elapsedMs < DOUBLE_TRIGGER_MS) return
+        // Going safari -> safari, so the run that was going on still belongs in the history.
+        if (SafariSession.isActive) fileRun()
+
         SafariSession.start()
         SafariStats.runStarted()
         val biome = ConfigManager.config.critterSafari.selectedBiome
@@ -21,16 +34,7 @@ object SafariRunController {
     fun onLeaveSafari() {
         if (!SafariSession.isActive) return
         val elapsed = SafariSession.elapsedMs
-        SafariStats.recordRun(
-            RunRecord(
-                startedAt = SafariSession.state.startedAt,
-                durationMs = elapsed,
-                uniques = SafariSession.uniqueTotal,
-                total = CritterBiome.totalCritterCount,
-                completed = SafariSession.isComplete,
-                valid = SafariSession.validForPersonalBest,
-            ),
-        )
+        fileRun()
         SafariSession.stop()
         SafariSession.save()
         ChatOut.send(
@@ -39,6 +43,20 @@ object SafariRunController {
             SafariSession.uniqueTotal,
             CritterBiome.totalCritterCount,
             SafariSession.duplicates,
+        )
+    }
+
+    /** Puts the run that is going on right now into the history. */
+    private fun fileRun() {
+        SafariStats.recordRun(
+            RunRecord(
+                startedAt = SafariSession.state.startedAt,
+                durationMs = SafariSession.elapsedMs,
+                uniques = SafariSession.uniqueTotal,
+                total = CritterBiome.totalCritterCount,
+                completed = SafariSession.isComplete,
+                valid = SafariSession.validForPersonalBest,
+            ),
         )
     }
 
