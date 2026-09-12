@@ -20,6 +20,7 @@ class CritterParsingTest {
         bundled.getAsJsonArray(key).map { Regex(it.asString) }
 
     private val catchPatterns get() = regexList("catch")
+    private val ignorePatterns get() = regexList("ignore")
     private val enterPatterns get() = regexList("enterSafari")
     private val startPatterns get() = regexList("activityStart")
     private val keywords get() = bundled.getAsJsonArray("catchKeywords").map { it.asString.lowercase() }
@@ -111,6 +112,31 @@ class CritterParsingTest {
         val parsed = parse("Tom_Fisher somehow captured the elusive Woodchucker today")
         assertEquals("Woodchucker", parsed?.critter)
         assertEquals("Tom_Fisher", parsed?.player)
+    }
+
+    @Test
+    fun `uncovering a disguised duplico is not a capture`() {
+        val line = CritterParsing.clean("You found a Duplico that was disguised as a block!")
+        assertTrue(
+            CritterParsing.matchesAny(line, ignorePatterns),
+            "the disguise line must be dropped before any catch parsing",
+        )
+    }
+
+    @Test
+    fun `capturing the duplico still counts`() {
+        val parsed = parse("CAPTURE! You caught a Duplico and gained 2x Duplico Shard!")
+        assertEquals("Duplico", parsed?.critter)
+        assertEquals("You", parsed?.player)
+    }
+
+    @Test
+    fun `another player capturing the duplico counts`() {
+        val parsed = parse(
+            "LOOT SHARE! You received 2x Duplico Shard from [MrJerson head]MrJerson catching a Duplico!",
+        )
+        assertEquals("Duplico", parsed?.critter)
+        assertEquals("MrJerson", parsed?.player)
     }
 
     @Test
