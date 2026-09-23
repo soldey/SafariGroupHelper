@@ -1,5 +1,6 @@
 package me.kmsold.safarigrouphelper
 
+import me.kmsold.safarigrouphelper.compat.McCompat
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import me.kmsold.safarigrouphelper.chat.ChatPatterns
 import me.kmsold.safarigrouphelper.chat.CritterChatParser
@@ -79,7 +80,7 @@ object SafariGroupHelper : ClientModInitializer {
             // screen hook instead, which draws on top so the HUD buttons stay clickable, and our
             // own screens draw the HUD themselves. Everything else - the pause menu, chat, and any
             // chest or NPC menu - keeps the HUD behind it.
-            val screen = Minecraft.getInstance().screen
+            val screen = McCompat.currentScreen
             val drawnElsewhere = screen.isPlayerInventory() || screen.isOwnScreen()
             if (!drawnElsewhere) HudRenderer.render(graphics, inInventory = false)
         }
@@ -132,7 +133,7 @@ object SafariGroupHelper : ClientModInitializer {
     private fun onTick() {
         queuedScreen?.let {
             queuedScreen = null
-            Minecraft.getInstance().setScreen(it)
+            McCompat.setScreen(it)
         }
         if (++tickCounter >= 10) {
             tickCounter = 0

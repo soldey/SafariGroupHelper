@@ -1,5 +1,6 @@
 package me.kmsold.safarigrouphelper.config
 
+import me.kmsold.safarigrouphelper.compat.McCompat
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -56,7 +57,7 @@ class GeneralConfig {
     )
     @ConfigEditorButton(buttonText = "Edit")
     val editPositions: Runnable = Runnable {
-        SafariGroupHelper.openScreen(HudEditorScreen(Minecraft.getInstance().screen))
+        SafariGroupHelper.openScreen(HudEditorScreen(McCompat.currentScreen))
     }
 
     @Expose
@@ -78,7 +79,7 @@ class CritterSafariHudConfig {
     )
     @ConfigEditorButton(buttonText = "Edit")
     val editPositions: Runnable = Runnable {
-        SafariGroupHelper.openScreen(HudEditorScreen(Minecraft.getInstance().screen))
+        SafariGroupHelper.openScreen(HudEditorScreen(McCompat.currentScreen))
     }
 
     @Expose

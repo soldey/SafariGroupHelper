@@ -1,5 +1,6 @@
 package me.kmsold.safarigrouphelper.hud
 
+import me.kmsold.safarigrouphelper.compat.McCompat
 import me.kmsold.safarigrouphelper.config.ConfigManager
 import me.kmsold.safarigrouphelper.util.text
 import me.kmsold.safarigrouphelper.util.tr
@@ -110,7 +111,7 @@ class HudEditorScreen(private val parent: Screen? = null) : Screen(tr("screen.hu
 
     override fun onClose() {
         ConfigManager.save()
-        minecraft.setScreen(parent)
+        McCompat.setScreen(parent)
     }
 
     private fun blockAt(mouseX: Double, mouseY: Double): HudBlock? =

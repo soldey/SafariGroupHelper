@@ -1,5 +1,6 @@
 package me.kmsold.safarigrouphelper.hud
 
+import me.kmsold.safarigrouphelper.compat.McCompat
 import me.kmsold.safarigrouphelper.config.ConfigManager
 import me.kmsold.safarigrouphelper.data.CritterBiome
 import me.kmsold.safarigrouphelper.data.SafariSession
@@ -48,6 +49,6 @@ class BiomeSelectScreen(private val parent: Screen?) : Screen(tr("screen.biomePi
     }
 
     override fun onClose() {
-        minecraft.setScreen(parent)
+        McCompat.setScreen(parent)
     }
 }
