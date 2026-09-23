@@ -1,5 +1,6 @@
 package me.kmsold.safarigrouphelper.util
 
+import me.kmsold.safarigrouphelper.compat.McCompat
 import me.kmsold.safarigrouphelper.l10n.Localization
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
@@ -18,7 +19,7 @@ fun tr(key: String, vararg args: Any?): MutableComponent = Component.literal(Loc
 object ChatOut {
 
     fun send(message: Component) {
-        val chat = Minecraft.getInstance().gui.chat
+        val chat = McCompat.chat
         chat.addClientSystemMessage(text(Localization.tr("chat.prefix")).append(message))
     }
 

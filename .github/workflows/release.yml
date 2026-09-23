@@ -45,9 +45,19 @@ jobs:
         if: steps.version.outputs.skip != 'true'
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Build
+      # One jar per supported Minecraft version; they only differ in the compat layer and in
+      # which Fabric API and MoulConfig build they carry.
+      - name: Build every Minecraft target
         if: steps.version.outputs.skip != 'true'
-        run: ./gradlew build -PmodVersion=${{ steps.version.outputs.version }}
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          for target in $(cat .github/mc-targets.txt); do
+            echo "::group::Minecraft $target"
+            ./gradlew build -PmcTarget="$target" -PmodVersion="$VERSION"
+            echo "::endgroup::"
+          done
+          ls -1 build/libs
 
       - name: Publish the release
         if: steps.version.outputs.skip != 'true'
@@ -61,29 +71,43 @@ jobs:
           git tag -a "v$VERSION" -m "Safari Group Helper $VERSION"
           git push origin "v$VERSION"
           gh release create "v$VERSION" \
-            "build/libs/safari-group-helper-$VERSION.jar" \
-            "build/libs/safari-group-helper-$VERSION-sources.jar" \
+            build/libs/safari-group-helper-"$VERSION"+mc*.jar \
             --title "Safari Group Helper $VERSION" \
             --notes-file /tmp/notes.md
 
       # Skipped silently until the MODRINTH_PROJECT_ID variable and the MODRINTH_TOKEN secret
       # are set on the repository, so the GitHub release never depends on Modrinth being set up.
-      - name: Publish to Modrinth
+      - name: Publish 26.1 to Modrinth
         if: steps.version.outputs.skip != 'true' && vars.MODRINTH_PROJECT_ID != '' && env.MODRINTH_TOKEN != ''
         uses: Kira-NT/mc-publish@v3.3.1
         with:
           modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
           modrinth-token: ${{ env.MODRINTH_TOKEN }}
-          files: build/libs/safari-group-helper-${{ steps.version.outputs.version }}.jar
-          name: Safari Group Helper ${{ steps.version.outputs.version }}
-          version: ${{ steps.version.outputs.version }}
+          files: build/libs/safari-group-helper-${{ steps.version.outputs.version }}+mc26.1.jar
+          name: Safari Group Helper ${{ steps.version.outputs.version }} for 26.1
+          version: ${{ steps.version.outputs.version }}+mc26.1
           version-type: release
           changelog-file: /tmp/notes.md
           loaders: fabric
-          # Keep in step with `minecraftDependency` in gradle.properties.
           game-versions: |
             26.1
             26.1.1
             26.1.2
           java: 25
           # Loader dependencies are read straight from fabric.mod.json.
+
+      - name: Publish 26.2 to Modrinth
+        if: steps.version.outputs.skip != 'true' && vars.MODRINTH_PROJECT_ID != '' && env.MODRINTH_TOKEN != ''
+        uses: Kira-NT/mc-publish@v3.3.1
+        with:
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ env.MODRINTH_TOKEN }}
+          files: build/libs/safari-group-helper-${{ steps.version.outputs.version }}+mc26.2.jar
+          name: Safari Group Helper ${{ steps.version.outputs.version }} for 26.2
+          version: ${{ steps.version.outputs.version }}+mc26.2
+          version-type: release
+          changelog-file: /tmp/notes.md
+          loaders: fabric
+          game-versions: |
+            26.2
+          java: 25

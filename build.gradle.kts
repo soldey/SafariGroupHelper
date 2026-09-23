@@ -9,28 +9,69 @@ plugins {
     kotlin("jvm") version "2.4.10"
 }
 
-val minecraftVersion: String by project
-val minecraftDependency: String by project
 val fabricLoaderVersion: String by project
-val fabricApiVersion: String by project
 val fabricKotlinVersion: String by project
 val javaVersion: String by project
 val moulConfigVersion: String by project
-val moulConfigMinecraftVersion: String by project
-val modMenuVersion: String by project
 val hypixelModApiVersion: String by project
-val hypixelModApiFabricVersion: String by project
 val modVersion: String by project
 val mavenGroup: String by project
 val archivesBaseName: String by project
 
+/**
+ * Everything that differs between the Minecraft versions we build for. The sources are shared;
+ * only these coordinates change, so adding a version is one line here - as soon as MoulConfig
+ * publishes a build for it, which is what gates 26.3 today.
+ */
+data class McTarget(
+    /** The exact Minecraft build to compile against. */
+    val minecraft: String,
+    /** The range written into fabric.mod.json, so patch releases of the same line are accepted. */
+    val dependency: String,
+    val fabricApi: String,
+    /** The `modern-<x>` MoulConfig artifact. */
+    val moulConfig: String,
+    val modMenu: String,
+    val hypixelModApiFabric: String,
+)
+
+val mcTargets = mapOf(
+    "26.1" to McTarget(
+        minecraft = "26.1.2",
+        dependency = "~26.1",
+        fabricApi = "0.155.2+26.1.2",
+        moulConfig = "26.1",
+        modMenu = "18.0.1",
+        hypixelModApiFabric = "1.0.2+build.1+mc26.1",
+    ),
+    "26.2" to McTarget(
+        minecraft = "26.2",
+        dependency = "~26.2",
+        fabricApi = "0.161.0+26.2",
+        moulConfig = "26.2",
+        modMenu = "20.0.2",
+        // No 26.2 build exists; the 26.1 one is listed for 26.2 as well.
+        hypixelModApiFabric = "1.0.2+build.1+mc26.1",
+    ),
+)
+
+val mcTarget: String = (findProperty("mcTarget") as String?) ?: "26.1"
+val target = mcTargets[mcTarget]
+    ?: error("Unknown mcTarget '$mcTarget', pick one of ${mcTargets.keys.joinToString()}")
+
 group = mavenGroup
-version = modVersion
+// The Minecraft version is build metadata, which keeps the jars of one release apart.
+version = "$modVersion+mc$mcTarget"
 base.archivesName.set(archivesBaseName)
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(javaVersion.toInt()))
     withSourcesJar()
+}
+
+// Only the compat layer differs between versions; everything else is shared.
+sourceSets.main {
+    kotlin.srcDir("src/main/kotlin-$mcTarget")
 }
 
 repositories {
@@ -55,24 +96,24 @@ val shadowImpl: Configuration = configurations.create("shadowImpl") {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:$minecraftVersion")
+    minecraft("com.mojang:minecraft:${target.minecraft}")
 
     implementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
-    implementation("net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
+    implementation("net.fabricmc.fabric-api:fabric-api:${target.fabricApi}")
     implementation("net.fabricmc:fabric-language-kotlin:$fabricKotlinVersion")
 
     // The settings GUI, the same library SkyHanni uses.
-    shadowImpl("org.notenoughupdates.moulconfig:modern-$moulConfigMinecraftVersion:$moulConfigVersion") {
+    shadowImpl("org.notenoughupdates.moulconfig:modern-${target.moulConfig}:$moulConfigVersion") {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
 
     // Optional at runtime: the modmenu entrypoint is only loaded when ModMenu is installed.
-    implementation("maven.modrinth:modmenu:$modMenuVersion")
+    implementation("maven.modrinth:modmenu:${target.modMenu}")
 
     // Optional at runtime: provided by the hypixel-mod-api mod when the player has it installed.
     compileOnly("net.hypixel:mod-api:$hypixelModApiVersion")
-    runtimeOnly("maven.modrinth:hypixel-mod-api:$hypixelModApiFabricVersion")
+    runtimeOnly("maven.modrinth:hypixel-mod-api:${target.hypixelModApiFabric}")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.14.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -99,7 +140,7 @@ loom {
 tasks.processResources {
     val props = mapOf(
         "version" to version,
-        "minecraft" to minecraftDependency,
+        "minecraft" to target.dependency,
         "fabricLoader" to fabricLoaderVersion,
         "fabricKotlin" to fabricKotlinVersion,
     )

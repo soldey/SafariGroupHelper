@@ -25,5 +25,10 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Build
-        run: ./gradlew build
+      - name: Build every Minecraft target
+        run: |
+          for target in $(cat .github/mc-targets.txt); do
+            echo "::group::Minecraft $target"
+            ./gradlew build -PmcTarget="$target"
+            echo "::endgroup::"
+          done

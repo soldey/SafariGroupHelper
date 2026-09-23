@@ -3,8 +3,9 @@
 A Fabric client mod for Hypixel SkyBlock that tracks the **unique critters** your group catches
 during a single Critter Safari run.
 
-Targets **Minecraft 26.1.x** (built against 26.1.2) and needs Fabric Loader 0.19.3+, Fabric API
-and Fabric Language Kotlin. ModMenu is optional.
+Supports **Minecraft 26.1.x and 26.2**, with a separate jar per version - take the one matching
+your game. Needs Fabric Loader 0.19.3+, Fabric API and Fabric Language Kotlin; ModMenu is
+optional.
 
 `hypixel-mod-api` is **strongly recommended**: it tells the mod exactly where you are
 (`mode=safari` / `mode=foraging_3`). Without it the mod falls back to the `⏣ <area>` line of the

@@ -1,5 +1,6 @@
 package me.kmsold.safarigrouphelper.hud
 
+import me.kmsold.safarigrouphelper.compat.McCompat
 import me.kmsold.safarigrouphelper.data.LocationTracker
 import me.kmsold.safarigrouphelper.data.SafariSession
 import me.kmsold.safarigrouphelper.util.ChatOut
@@ -18,7 +19,7 @@ object HudInteractions {
 
     fun click(action: HudAction, parent: Screen?) {
         when (action) {
-            HudAction.SWITCH_BIOME -> Minecraft.getInstance().setScreen(BiomeSelectScreen(parent))
+            HudAction.SWITCH_BIOME -> McCompat.setScreen(BiomeSelectScreen(parent))
             HudAction.RESET_RUN -> resetRun()
         }
     }
